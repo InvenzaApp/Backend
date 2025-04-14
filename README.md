@@ -5,7 +5,7 @@
 ***
 To initialize project just run this command in terminal:
 ```
-sudo npm i
+npm i
 ```
 When you initialize project, you can start server with command:
 ```
