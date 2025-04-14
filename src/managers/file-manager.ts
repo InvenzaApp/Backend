@@ -43,6 +43,11 @@ class FileManager {
             this.createEmptyFile();
         }
     }
+
+    getFileAsJson(){
+        const fileData = fs.readFileSync(this.filePath).toString();
+        return JSON.parse(fileData);
+    }
 }
 
 export default FileManager;

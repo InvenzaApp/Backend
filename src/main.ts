@@ -13,7 +13,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use('/api/user', userRouter);
 
 const initialize = () => {
-   const user = new UserModule("users");
+   const user = new UserModule();
 }
 
 app.listen(port, () => {
