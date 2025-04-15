@@ -1,19 +1,21 @@
-type UserJson = {
+import {Organization, OrganizationJson} from "./organization";
+
+export type UserJson = {
     name: string;
     lastname: string;
     email: string;
     password: string;
-    organizationId: number;
+    organization: OrganizationJson;
     groupsIdList: number[];
 }
 
-class User{
+export class User{
     constructor(
         public name: string,
         public lastname: string,
         public email: string,
         public password: string,
-        public organizationId: number,
+        public organization: Organization,
         public groupsIdList: number[],
     ) {}
 
@@ -23,7 +25,7 @@ class User{
             json.lastname,
             json.email,
             json.password,
-            json.organizationId,
+            Organization.fromJson(json.organization),
             json.groupsIdList,
         );
     }
@@ -34,10 +36,8 @@ class User{
             lastname: this.lastname,
             email: this.email,
             password: this.password,
-            organizationId: this.organizationId,
+            organization: this.organization.toJson(),
             groupsIdList: this.groupsIdList,
         }
     }
 }
-
-export default User;

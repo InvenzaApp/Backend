@@ -48,6 +48,24 @@ class FileManager {
         const fileData = fs.readFileSync(this.filePath).toString();
         return JSON.parse(fileData);
     }
+
+    saveJsonAsFile(json: any){
+        fs.writeFileSync(this.filePath, JSON.stringify(json, null, 2));
+    }
+
+    isEmpty(): boolean {
+        if(!this.fileExists()){
+            return true;
+        }
+
+        const data = fs.readFileSync(this.filePath);
+
+        if(data === null){
+            return true;
+        }
+
+        return data.toString() == '[]';
+    }
 }
 
 export default FileManager;
