@@ -1,0 +1,5 @@
+# Project files
+/node_modules/
+.idea/
+.env
+src/database
