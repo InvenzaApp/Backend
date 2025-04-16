@@ -1,12 +1,16 @@
+import {User, UserJson} from "./user";
+
 export type OrganizationJson = {
     id: number;
     name: string;
+    users: UserJson[];
 }
 
 export class Organization {
     constructor(
         public id: number,
         public name: string,
+        public users: User[],
     ) {
     }
 
@@ -14,6 +18,7 @@ export class Organization {
         return new Organization(
             json.id,
             json.name,
+            json.users.map(userJson => User.fromJson(userJson)),
         );
     }
 
@@ -21,6 +26,7 @@ export class Organization {
         return {
             id: this.id,
             name: this.name,
+            users: this.users.map(userJson => User.fromJson(userJson)),
         }
     }
 }

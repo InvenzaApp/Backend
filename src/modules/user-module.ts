@@ -1,7 +1,6 @@
 import FileManager from "../managers/file-manager";
 import hashPassword from "../helpers/hash-password";
 import {User} from "../models/user";
-import {Organization} from "../models/organization";
 require("dotenv").config();
 
 class UserModule {
@@ -16,14 +15,13 @@ class UserModule {
     }
 
     private initializeFile(){
-        const defaultCompany = new Organization(0, "Invenza");
         const defaultUser = new User(
             0,
             "Administrator",
             "Developer",
             "admin@invenza.pl",
             hashPassword(process.env.DEFAULT_USER_PASSWORD!),
-            defaultCompany,
+            0,
             [],
         );
 
@@ -39,6 +37,11 @@ class UserModule {
         }else{
             return null;
         }
+    }
+
+    getUserById(id: number): User{
+        const jsonData = this.file.getFileAsJson();
+        return jsonData.find((user: any) => user.id === id);
     }
 }
 
