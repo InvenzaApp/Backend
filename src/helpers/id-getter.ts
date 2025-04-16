@@ -1,11 +1,19 @@
-const getNextId = (json: any): number => {
-    const id = json.id;
+const getNextId = (json: any[]): number => {
+    try {
+        if (!Array.isArray(json) || json.length === 0) {
+            return 0;
+        }
 
-    if(json.id == undefined) {
+        const lastItem = json[json.length - 1];
+
+        if (!lastItem || typeof lastItem.id !== 'number') {
+            return 0;
+        }
+
+        return lastItem.id + 1;
+    } catch {
         return 0;
     }
-
-    return id + 1;
-}
+};
 
 export default getNextId;
