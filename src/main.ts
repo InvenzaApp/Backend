@@ -1,6 +1,7 @@
 import express from 'express';
 import userRouter from './routers/user';
 import UserModule from './modules/user-module';
+import CompanyModule from "./modules/company-module";
 
 require('dotenv').config();
 
@@ -13,7 +14,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use('/api/user', userRouter);
 
 const initialize = () => {
-   const user = new UserModule();
+   new UserModule(true);
+   new CompanyModule(true);
 }
 
 app.listen(port, () => {
