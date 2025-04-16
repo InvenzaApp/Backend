@@ -2,9 +2,8 @@ import {Router} from "express";
 import {INVALID_REQUEST_PARAMETERS} from "../helpers/response-codes";
 import {TaskModule} from "../modules/task-module";
 
-const taskModule = new TaskModule();
-
 const router = Router();
+const taskModule = new TaskModule();
 
 router.post('/', (req, res) => {
     const { title, description, deadline, groupsIdList } = req.body;
