@@ -1,7 +1,10 @@
 import express from 'express';
 import userRouter from './routers/user';
+import tasksRouter from './routers/task';
+import organizationRouter from './routers/organization';
 import UserModule from './modules/user-module';
-import CompanyModule from "./modules/company-module";
+import OrganizationModule from "./modules/organization-module";
+import {TaskModule} from "./modules/task-module";
 
 require('dotenv').config();
 
@@ -12,10 +15,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use('/api/user', userRouter);
+app.use('/api/tasks', tasksRouter);
+app.use('/api/organization', organizationRouter);
 
 const initialize = () => {
    new UserModule(true);
-   new CompanyModule(true);
+   new OrganizationModule(true);
+   new TaskModule(true);
 }
 
 app.listen(port, () => {

@@ -1,11 +1,9 @@
-import {Organization, OrganizationJson} from "./organization";
-
 export type UserJson = {
     name: string;
     lastname: string;
     email: string;
     password: string;
-    organization: OrganizationJson;
+    organizationId: number;
     groupsIdList: number[];
 }
 
@@ -15,7 +13,7 @@ export class User{
         public lastname: string,
         public email: string,
         public password: string,
-        public organization: Organization,
+        public organizationId: number,
         public groupsIdList: number[],
     ) {}
 
@@ -25,7 +23,7 @@ export class User{
             json.lastname,
             json.email,
             json.password,
-            Organization.fromJson(json.organization),
+            json.organizationId,
             json.groupsIdList,
         );
     }
@@ -36,7 +34,7 @@ export class User{
             lastname: this.lastname,
             email: this.email,
             password: this.password,
-            organization: this.organization.toJson(),
+            organizationId: this.organizationId,
             groupsIdList: this.groupsIdList,
         }
     }
