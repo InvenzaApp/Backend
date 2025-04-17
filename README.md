@@ -7,7 +7,7 @@ Invenza - Backend
 Invenza is a simple app, which allows you to create your team, create groups of users, and follow tasks
 
 ## YouTrack
-[Open YouTrack](https://invenza.youtrack.cloud/agiles/182-4/current)
+[Open YouTrack](https://invenza.youtrack.cloud/agiles/182-2/current)
 
 ## Getting Started
 
