@@ -1,9 +1,12 @@
 import FileManager from "../managers/file-manager";
 import {Task} from "../models/task";
 import IdGetter from "../helpers/id-getter";
+import {GroupModule} from "./group-module";
+import {Group} from "../models/group";
 
 export class TaskModule{
     file = new FileManager("database", "tasks");
+    groupModule = new GroupModule();
 
     constructor(createDefaultTasks: boolean = false) {
         this.file.initializeFile();
@@ -61,7 +64,20 @@ export class TaskModule{
 
     getTask(resourceId: number): Task{
         const jsonData = this.file.getFileAsJson();
-        return jsonData.find((item: any) => item.id === resourceId);
+        const task = jsonData.find((item: any) => item.id === resourceId);
+
+        const groupsIdList = task.groupsIdList;
+
+        let tmpList: Group[] = [];
+
+        groupsIdList.forEach((group: any) => {
+            const item = this.groupModule.getGroup(group);
+            tmpList.push(item);
+        })
+
+        task.groupsList = tmpList;
+
+        return task;
     }
 
     deleteTask(resourceId: number) {

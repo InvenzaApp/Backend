@@ -16,6 +16,7 @@ class OrganizationModule {
 
     private initializeFile(){
         const defaultCompany = new Organization(0, "Invenza", [new User(
+            0,
             "Administrator",
             "Developer",
             "admin@invenza.pl",
