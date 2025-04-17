@@ -1,5 +1,6 @@
 import FileManager from "../managers/file-manager";
 import {Group} from "../models/group";
+import IdGetter from "../helpers/id-getter";
 
 export class GroupModule{
     file = new FileManager("database", "groups");
@@ -23,5 +24,22 @@ export class GroupModule{
 
     getGroups(){
         return this.file.getFileAsJson();
+    }
+
+    addGroup(name: string, usersIdList: number[]): number {
+        const jsonData = this.file.getFileAsJson();
+        const newId = IdGetter(jsonData);
+
+        const newGroup = new Group(
+            newId,
+            name,
+            usersIdList,
+        );
+
+        jsonData.push(newGroup.toJson());
+
+        this.file.saveJsonAsFile(jsonData);
+
+        return newId;
     }
 }
