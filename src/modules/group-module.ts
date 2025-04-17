@@ -42,4 +42,18 @@ export class GroupModule{
 
         return newId;
     }
+
+    getGroup(id: number): Group {
+        const jsonData = this.file.getFileAsJson();
+        const group = jsonData.find((item: any)=> item.id == id);
+
+        return Group.fromJson(group);
+    }
+
+    getGroupNameById(id: number): string{
+        const jsonData = this.file.getFileAsJson();
+        const group = jsonData.find((group: any) => group.id === id);
+
+        return group.name;
+    }
 }
