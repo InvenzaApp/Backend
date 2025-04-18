@@ -3,6 +3,9 @@ import {Task} from "../models/task";
 import IdGetter from "../helpers/id-getter";
 import {GroupModule} from "./group-module";
 import {Group} from "../models/group";
+import {taskFaker} from "../fakers/task";
+import {User} from "../models/user";
+import {DateTime} from "../helpers/date-time";
 
 export class TaskModule{
     file = new FileManager("database", "tasks");
@@ -17,22 +20,14 @@ export class TaskModule{
     }
 
     private initializeFile() {
-        const defaultTask = new Task(
-            0,
-            "Ukończyć aplikacje",
-            "Dokończyć aplikację w najbliższym czasie",
-            null,
-            [0]
-        );
-
-        this.file.saveJsonAsFile([defaultTask.toJson()]);
+        this.file.saveJsonAsFile([taskFaker.toJson()]);
     }
 
-    addTask(title: string, description: string|null, deadline: string|null, groupsIdList: number[]): number{
+    addTask(title: string, description: string|null, deadline: string|null, groupsIdList: number[], createdBy: User): number{
         const jsonData = this.file.getFileAsJson();
         const newId = IdGetter(jsonData);
 
-        const newTask = new Task(newId, title, description, deadline, groupsIdList);
+        const newTask = new Task(newId, title, description, deadline, groupsIdList, DateTime.getFullTimestamp(), createdBy);
 
         jsonData.push(newTask.toJson());
 

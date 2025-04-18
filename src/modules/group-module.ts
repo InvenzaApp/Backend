@@ -1,6 +1,7 @@
 import FileManager from "../managers/file-manager";
 import {Group} from "../models/group";
 import IdGetter from "../helpers/id-getter";
+import {groupFaker} from "../fakers/group";
 
 export class GroupModule{
     file = new FileManager("database", "groups");
@@ -13,13 +14,7 @@ export class GroupModule{
     }
 
     private initializeFile(){
-        const defaultGroup = new Group(
-            0,
-            "Programiści",
-            [0],
-        );
-
-        this.file.saveJsonAsFile([defaultGroup.toJson()]);
+        this.file.saveJsonAsFile([groupFaker.toJson()]);
     }
 
     getGroups(){
