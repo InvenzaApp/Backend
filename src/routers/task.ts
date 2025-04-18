@@ -4,10 +4,12 @@ import {TaskModule} from "../modules/task-module";
 import {performFailureResponse, performSuccessResponse} from "../helpers/responses";
 import {authMiddleware} from "../authorization/api_authorization";
 import {TokenManager} from "../managers/token-manager";
+import UserModule from "../modules/user-module";
 
 const router = Router();
 const taskModule = new TaskModule();
 const tokenManager = new TokenManager();
+const userModule = new UserModule();
 
 router.post('/', authMiddleware, (req, res) => {
     const { title, description, deadline, groupsIdList } = req.body;
@@ -19,7 +21,9 @@ router.post('/', authMiddleware, (req, res) => {
         return;
     }
 
-    const taskId = taskModule.addTask(title, description, deadline, groupsIdList);
+    const user = userModule.getUserById(userId);
+
+    const taskId = taskModule.addTask(title, description, deadline, groupsIdList, user);
 
     performSuccessResponse(res, taskId, token);
 });
