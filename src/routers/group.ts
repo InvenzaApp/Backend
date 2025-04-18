@@ -18,6 +18,16 @@ router.get('/', authMiddleware, (req, res) => {
     performSuccessResponse(res, groupsList, token);
 });
 
+router.get('/:id', authMiddleware, (req, res) => {
+    const { userId } = (req as any).user;
+    const token = tokenManager.getAccessToken(userId);
+    const groupId = Number(req.params.id);
+
+    const group = groupModule.getGroup(groupId);
+
+    performSuccessResponse(res, group, token);
+});
+
 router.post('/', authMiddleware, (req, res) => {
    const { name, usersIdList } = req.body;
     const { userId } = (req as any).user;
