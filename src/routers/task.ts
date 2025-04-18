@@ -2,12 +2,17 @@ import {Router} from "express";
 import {INVALID_REQUEST_PARAMETERS} from "../helpers/response-codes";
 import {TaskModule} from "../modules/task-module";
 import {performFailureResponse, performSuccessResponse} from "../helpers/responses";
+import {authMiddleware} from "../authorization/api_authorization";
+import {TokenManager} from "../managers/token-manager";
 
 const router = Router();
 const taskModule = new TaskModule();
+const tokenManager = new TokenManager();
 
-router.post('/', (req, res) => {
+router.post('/', authMiddleware, (req, res) => {
     const { title, description, deadline, groupsIdList } = req.body;
+    const { userId } = (req as any).user;
+    const token = tokenManager.getAccessToken(userId);
 
     if(!title || !groupsIdList){
         performFailureResponse(res, INVALID_REQUEST_PARAMETERS);
@@ -16,12 +21,14 @@ router.post('/', (req, res) => {
 
     const taskId = taskModule.addTask(title, description, deadline, groupsIdList);
 
-    performSuccessResponse(res, taskId);
+    performSuccessResponse(res, taskId, token);
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', authMiddleware, (req, res) => {
     const id = Number(req.params.id);
     const { title, description, deadline, groupsIdList } = req.body;
+    const { userId } = (req as any).user;
+    const token = tokenManager.getAccessToken(userId);
 
     if(!title || !groupsIdList){
         performFailureResponse(res, INVALID_REQUEST_PARAMETERS);
@@ -30,28 +37,34 @@ router.put('/:id', (req, res) => {
 
     const taskId = taskModule.updateTask(id, title, description, deadline, groupsIdList);
 
-    performSuccessResponse(res, taskId);
+    performSuccessResponse(res, taskId, token);
 });
 
-router.get('/', (req, res) => {
+router.get('/', authMiddleware, (req, res) => {
+    const { userId } = (req as any).user;
+    const token = tokenManager.getAccessToken(userId);
     const tasks = taskModule.getTasks();
-    performSuccessResponse(res, tasks);
+    performSuccessResponse(res, tasks, token);
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', authMiddleware, (req, res) => {
     const resourceId = Number(req.params.id);
+    const { userId } = (req as any).user;
+    const token = tokenManager.getAccessToken(userId);
 
     const task = taskModule.getTask(resourceId);
 
-    performSuccessResponse(res, task);
+    performSuccessResponse(res, task, token);
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', authMiddleware, (req, res) => {
     const resourceId = Number(req.params.id);
+    const { userId } = (req as any).user;
+    const token = tokenManager.getAccessToken(userId);
 
     taskModule.deleteTask(resourceId);
 
-    performSuccessResponse(res, resourceId);
+    performSuccessResponse(res, resourceId, token);
 });
 
 export default router;
