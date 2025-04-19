@@ -10,6 +10,7 @@ const router = Router();
 const tokenManager = new TokenManager();
 const userModule = new UserModule();
 const isDebug = process.env.DEBUG;
+const delayTime = (process.env.DELAY || 300) as number;
 
 router.post('/sign-in', async (req, res) => {
     const { email, password } = req.body;
@@ -23,7 +24,7 @@ router.post('/sign-in', async (req, res) => {
 
     if(!userData) {
         if(isDebug){
-            await delay(2000);
+            await delay(delayTime);
         }
 
         performFailureResponse(res, INVALID_CREDENTIALS);
@@ -33,7 +34,7 @@ router.post('/sign-in', async (req, res) => {
     const token = tokenManager.getAccessToken(userData.id);
 
     if(isDebug){
-        await delay(2000);
+        await delay(delayTime);
     }
     performSuccessResponse(res, userData.toJson(), token);
 });

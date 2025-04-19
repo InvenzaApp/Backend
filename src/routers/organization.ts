@@ -10,6 +10,7 @@ const router = Router();
 const organizationModule = new OrganizationModule();
 const tokenManager = new TokenManager();
 const isDebug = process.env.DEBUG;
+const delayTime = (process.env.DELAY || 300) as number;
 
 router.get('/:organizationId', authMiddleware, async (req, res) => {
     const organizationId = Number(req.params.organizationId);
@@ -18,7 +19,7 @@ router.get('/:organizationId', authMiddleware, async (req, res) => {
     const token = tokenManager.getAccessToken(userId);
 
     if(isDebug){
-        await delay(2000);
+        await delay(delayTime);
     }
 
     performSuccessResponse(res, organization, token);
