@@ -45,6 +45,23 @@ router.post('/', authMiddleware, (req, res) => {
    performSuccessResponse(res, groupId, token);
 });
 
+router.put('/:id', authMiddleware, (req, res) => {
+    const { name, usersIdList } = req.body;
+    const { userId } = (req as any).user;
+    const token = tokenManager.getAccessToken(userId);
+
+    if(!name || !usersIdList){
+        performFailureResponse(res, INVALID_REQUEST_PARAMETERS);
+        return;
+    }
+
+    const groupId = Number(req.params.id);
+
+    groupModule.updateGroup(groupId, name, usersIdList);
+
+    performSuccessResponse(res, groupId, token);
+})
+
 router.delete('/:id', authMiddleware, (req, res) => {
     const { userId } = (req as any).user;
     const token = tokenManager.getAccessToken(userId);

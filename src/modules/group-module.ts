@@ -57,6 +57,16 @@ export class GroupModule{
         return group;
     }
 
+    updateGroup(groupId: number, name: String, usersIdList: number[]) {
+        const jsonData = this.file.getFileAsJson();
+
+        const group = jsonData.find((item: any) => item.id == groupId);
+        group.name = name;
+        group.usersIdList = usersIdList;
+
+        this.file.saveJsonAsFile(jsonData);
+    }
+
     deleteGroup(groupId: number){
         const jsonData = this.file.getFileAsJson();
         const filteredData = jsonData.filter((item: any) => item.id !== groupId);
