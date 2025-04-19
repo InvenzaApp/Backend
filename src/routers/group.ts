@@ -5,32 +5,43 @@ import {performFailureResponse, performSuccessResponse} from "../helpers/respons
 import {authMiddleware} from "../authorization/api_authorization";
 import {TokenManager} from "../managers/token-manager";
 import {TaskModule} from "../modules/task-module";
+import {delay} from "../helpers/delay";
+require("dotenv").config();
 
 const router = Router();
 const groupModule = new GroupModule();
 const tokenManager = new TokenManager()
 const taskModule = new TaskModule();
+const isDebug = process.env.DEBUG;
 
-router.get('/', authMiddleware, (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
     const { userId } = (req as any).user;
     const token = tokenManager.getAccessToken(userId);
 
     const groupsList = groupModule.getGroups();
 
+    if(isDebug){
+        await delay(2000);
+    }
+
     performSuccessResponse(res, groupsList, token);
 });
 
-router.get('/:id', authMiddleware, (req, res) => {
+router.get('/:id', authMiddleware, async (req, res) => {
     const { userId } = (req as any).user;
     const token = tokenManager.getAccessToken(userId);
     const groupId = Number(req.params.id);
 
     const group = groupModule.getGroup(groupId);
 
+    if(isDebug){
+        await delay(2000);
+    }
+
     performSuccessResponse(res, group, token);
 });
 
-router.post('/', authMiddleware, (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
    const { name, usersIdList } = req.body;
     const { userId } = (req as any).user;
     const token = tokenManager.getAccessToken(userId);
@@ -42,10 +53,14 @@ router.post('/', authMiddleware, (req, res) => {
 
    const groupId = groupModule.addGroup(name, usersIdList);
 
+    if(isDebug){
+        await delay(2000);
+    }
+
    performSuccessResponse(res, groupId, token);
 });
 
-router.put('/:id', authMiddleware, (req, res) => {
+router.put('/:id', authMiddleware, async (req, res) => {
     const { name, usersIdList } = req.body;
     const { userId } = (req as any).user;
     const token = tokenManager.getAccessToken(userId);
@@ -59,16 +74,24 @@ router.put('/:id', authMiddleware, (req, res) => {
 
     groupModule.updateGroup(groupId, name, usersIdList);
 
+    if(isDebug){
+        await delay(2000);
+    }
+
     performSuccessResponse(res, groupId, token);
 })
 
-router.delete('/:id', authMiddleware, (req, res) => {
+router.delete('/:id', authMiddleware, async (req, res) => {
     const { userId } = (req as any).user;
     const token = tokenManager.getAccessToken(userId);
     const groupId = Number(req.params.id);
 
     groupModule.deleteGroup(groupId);
     taskModule.removeGroupFromTasks(groupId);
+
+    if(isDebug){
+        await delay(2000);
+    }
 
     performSuccessResponse(res, groupId, token);
 })

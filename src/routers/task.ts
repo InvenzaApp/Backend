@@ -6,14 +6,17 @@ import {authMiddleware} from "../authorization/api_authorization";
 import {TokenManager} from "../managers/token-manager";
 import UserModule from "../modules/user-module";
 import OrganizationModule from "../modules/organization-module";
+import {delay} from "../helpers/delay";
+require("dotenv").config();
 
 const router = Router();
 const taskModule = new TaskModule();
 const tokenManager = new TokenManager();
 const userModule = new UserModule();
 const organizationModule = new OrganizationModule();
+const isDebug = process.env.DEBUG;
 
-router.post('/', authMiddleware, (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
     const { title, description, deadline, groupsIdList } = req.body;
     const { userId } = (req as any).user;
     const token = tokenManager.getAccessToken(userId);
@@ -27,10 +30,14 @@ router.post('/', authMiddleware, (req, res) => {
 
     const taskId = taskModule.addTask(title, description, deadline, groupsIdList, user);
 
+    if(isDebug){
+        await delay(2000);
+    }
+
     performSuccessResponse(res, taskId, token);
 });
 
-router.put('/:id', authMiddleware, (req, res) => {
+router.put('/:id', authMiddleware, async (req, res) => {
     const id = Number(req.params.id);
     const { title, description, deadline, groupsIdList } = req.body;
     const { userId } = (req as any).user;
@@ -43,10 +50,14 @@ router.put('/:id', authMiddleware, (req, res) => {
 
     const taskId = taskModule.updateTask(id, title, description, deadline, groupsIdList);
 
+    if(isDebug){
+        await delay(2000);
+    }
+
     performSuccessResponse(res, taskId, token);
 });
 
-router.get('/', authMiddleware, (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
     const { userId } = (req as any).user;
     const token = tokenManager.getAccessToken(userId);
 
@@ -60,25 +71,38 @@ router.get('/', authMiddleware, (req, res) => {
     }else{
         tasks = taskModule.getTasks();
     }
+
+    if(isDebug){
+        await delay(2000);
+    }
+
     performSuccessResponse(res, tasks, token);
 });
 
-router.get('/:id', authMiddleware, (req, res) => {
+router.get('/:id', authMiddleware, async (req, res) => {
     const resourceId = Number(req.params.id);
     const { userId } = (req as any).user;
     const token = tokenManager.getAccessToken(userId);
 
     const task = taskModule.getTask(resourceId);
 
+    if(isDebug){
+        await delay(2000);
+    }
+
     performSuccessResponse(res, task, token);
 });
 
-router.delete('/:id', authMiddleware, (req, res) => {
+router.delete('/:id', authMiddleware, async (req, res) => {
     const resourceId = Number(req.params.id);
     const { userId } = (req as any).user;
     const token = tokenManager.getAccessToken(userId);
 
     taskModule.deleteTask(resourceId);
+
+    if(isDebug){
+        await delay(2000);
+    }
 
     performSuccessResponse(res, resourceId, token);
 });
