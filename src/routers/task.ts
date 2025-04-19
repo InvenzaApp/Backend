@@ -15,6 +15,7 @@ const tokenManager = new TokenManager();
 const userModule = new UserModule();
 const organizationModule = new OrganizationModule();
 const isDebug = process.env.DEBUG;
+const delayTime = (process.env.DELAY || 300) as number;
 
 router.post('/', authMiddleware, async (req, res) => {
     const { title, description, deadline, groupsIdList } = req.body;
@@ -31,7 +32,7 @@ router.post('/', authMiddleware, async (req, res) => {
     const taskId = taskModule.addTask(title, description, deadline, groupsIdList, user);
 
     if(isDebug){
-        await delay(2000);
+        await delay(delayTime);
     }
 
     performSuccessResponse(res, taskId, token);
@@ -44,6 +45,10 @@ router.put('/:id', authMiddleware, async (req, res) => {
     const token = tokenManager.getAccessToken(userId);
 
     if(!title || !groupsIdList){
+        if(isDebug){
+            await delay(delayTime);
+        }
+
         performFailureResponse(res, INVALID_REQUEST_PARAMETERS);
         return;
     }
@@ -51,7 +56,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
     const taskId = taskModule.updateTask(id, title, description, deadline, groupsIdList);
 
     if(isDebug){
-        await delay(2000);
+        await delay(delayTime);
     }
 
     performSuccessResponse(res, taskId, token);
@@ -73,7 +78,7 @@ router.get('/', authMiddleware, async (req, res) => {
     }
 
     if(isDebug){
-        await delay(2000);
+        await delay(delayTime);
     }
 
     performSuccessResponse(res, tasks, token);
@@ -87,7 +92,7 @@ router.get('/:id', authMiddleware, async (req, res) => {
     const task = taskModule.getTask(resourceId);
 
     if(isDebug){
-        await delay(2000);
+        await delay(delayTime);
     }
 
     performSuccessResponse(res, task, token);
@@ -101,7 +106,7 @@ router.delete('/:id', authMiddleware, async (req, res) => {
     taskModule.deleteTask(resourceId);
 
     if(isDebug){
-        await delay(2000);
+        await delay(delayTime);
     }
 
     performSuccessResponse(res, resourceId, token);

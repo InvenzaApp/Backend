@@ -13,6 +13,7 @@ const groupModule = new GroupModule();
 const tokenManager = new TokenManager()
 const taskModule = new TaskModule();
 const isDebug = process.env.DEBUG;
+const delayTime = (process.env.DELAY || 300) as number;
 
 router.get('/', authMiddleware, async (req, res) => {
     const { userId } = (req as any).user;
@@ -21,7 +22,7 @@ router.get('/', authMiddleware, async (req, res) => {
     const groupsList = groupModule.getGroups();
 
     if(isDebug){
-        await delay(2000);
+        await delay(delayTime);
     }
 
     performSuccessResponse(res, groupsList, token);
@@ -35,7 +36,7 @@ router.get('/:id', authMiddleware, async (req, res) => {
     const group = groupModule.getGroup(groupId);
 
     if(isDebug){
-        await delay(2000);
+        await delay(delayTime);
     }
 
     performSuccessResponse(res, group, token);
@@ -54,7 +55,7 @@ router.post('/', authMiddleware, async (req, res) => {
    const groupId = groupModule.addGroup(name, usersIdList);
 
     if(isDebug){
-        await delay(2000);
+        await delay(delayTime);
     }
 
    performSuccessResponse(res, groupId, token);
@@ -75,7 +76,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
     groupModule.updateGroup(groupId, name, usersIdList);
 
     if(isDebug){
-        await delay(2000);
+        await delay(delayTime);
     }
 
     performSuccessResponse(res, groupId, token);
@@ -90,7 +91,7 @@ router.delete('/:id', authMiddleware, async (req, res) => {
     taskModule.removeGroupFromTasks(groupId);
 
     if(isDebug){
-        await delay(2000);
+        await delay(delayTime);
     }
 
     performSuccessResponse(res, groupId, token);
