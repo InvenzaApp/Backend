@@ -7,14 +7,14 @@ import {taskFaker} from "../fakers/task";
 import {User} from "../models/user";
 import {DateTime} from "../helpers/date-time";
 
-export class TaskModule{
+export class TaskModule {
     file = new FileManager("database", "tasks");
     groupModule = new GroupModule();
 
     constructor(createDefaultTasks: boolean = false) {
         this.file.initializeFile();
 
-        if(createDefaultTasks && this.file.isEmpty()){
+        if (createDefaultTasks && this.file.isEmpty()) {
             this.initializeFile();
         }
     }
@@ -23,7 +23,7 @@ export class TaskModule{
         this.file.saveJsonAsFile([taskFaker.toJson()]);
     }
 
-    addTask(title: string, description: string|null, deadline: string|null, groupsIdList: number[], createdBy: User): number{
+    addTask(title: string, description: string | null, deadline: string | null, groupsIdList: number[], createdBy: User): number {
         const jsonData = this.file.getFileAsJson();
         const newId = IdGetter(jsonData);
 
@@ -35,11 +35,11 @@ export class TaskModule{
         return newId;
     }
 
-    updateTask(id: number, title: string, description: string|null, deadline: string|null, groupsIdList: number[]): number{
+    updateTask(id: number, title: string, description: string | null, deadline: string | null, groupsIdList: number[]): number {
         const jsonData = this.file.getFileAsJson();
         const task = jsonData.find((item: any) => item.id === id);
 
-        if(!task){
+        if (!task) {
             return id;
         }
 
@@ -58,7 +58,7 @@ export class TaskModule{
         return jsonData.map((task: any) => Task.fromJson(task));
     }
 
-    getTask(resourceId: number): Task{
+    getTask(resourceId: number): Task {
         const jsonData = this.file.getFileAsJson();
         const task = jsonData.find((item: any) => item.id === resourceId);
 
@@ -80,5 +80,16 @@ export class TaskModule{
         const jsonData = this.file.getFileAsJson();
         const newData = jsonData.filter((item: any) => item.id !== resourceId);
         this.file.saveJsonAsFile(newData);
+    }
+
+    removeGroupFromTasks(groupId: number) {
+        const tasksList = this.file.getFileAsJson();
+
+        tasksList.filter((item: any) => item.groupsIdList.includes(groupId)).forEach((task: any) => {
+            const groupsList = task.groupsIdList;
+            task.groupsIdList = groupsList.filter((groupItem: any) => groupItem !== groupId);
+        });
+
+        this.file.saveJsonAsFile(tasksList);
     }
 }
