@@ -5,11 +5,13 @@ import {performFailureResponse, performSuccessResponse} from "../helpers/respons
 import {authMiddleware} from "../authorization/api_authorization";
 import {TokenManager} from "../managers/token-manager";
 import UserModule from "../modules/user-module";
+import OrganizationModule from "../modules/organization-module";
 
 const router = Router();
 const taskModule = new TaskModule();
 const tokenManager = new TokenManager();
 const userModule = new UserModule();
+const organizationModule = new OrganizationModule();
 
 router.post('/', authMiddleware, (req, res) => {
     const { title, description, deadline, groupsIdList } = req.body;
@@ -47,7 +49,17 @@ router.put('/:id', authMiddleware, (req, res) => {
 router.get('/', authMiddleware, (req, res) => {
     const { userId } = (req as any).user;
     const token = tokenManager.getAccessToken(userId);
-    const tasks = taskModule.getTasks();
+
+    const organization = organizationModule.getOrganizationByUserId(userId);
+    const organizationAdmin = organizationModule.getOrganizationAdmin(organization.id);
+    const isUserAdmin = organizationAdmin.id == userId;
+
+    let tasks;
+    if(isUserAdmin){
+        tasks = taskModule.getTasks();
+    }else{
+        tasks = taskModule.getTasks();
+    }
     performSuccessResponse(res, tasks, token);
 });
 

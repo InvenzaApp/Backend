@@ -57,9 +57,15 @@ export class GroupModule{
         return group;
     }
 
+    deleteGroup(groupId: number){
+        const jsonData = this.file.getFileAsJson();
+        const filteredData = jsonData.filter((item: any) => item.id !== groupId);
+        this.file.saveJsonAsFile(filteredData);
+    }
+
     getGroupNameById(id: number): string{
         const jsonData = this.file.getFileAsJson();
-        const group = jsonData.find((group: any) => group.id === id);
+        const group = jsonData.find((item: any) => item.id === id);
 
         return group.name;
     }
