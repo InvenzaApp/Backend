@@ -53,8 +53,9 @@ export class TaskModule{
         return id;
     }
 
-    getTasks() {
-        return this.file.getFileAsJson();
+    getTasks(): Task[] {
+        const jsonData = this.file.getFileAsJson();
+        return jsonData.map((task: any) => Task.fromJson(task));
     }
 
     getTask(resourceId: number): Task{
