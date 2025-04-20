@@ -1,6 +1,7 @@
 import FileManager from "../managers/file-manager";
 import hashPassword from "../helpers/hash-password";
 import {User} from "../models/user";
+import {userFaker} from "../fakers/user";
 require("dotenv").config();
 
 class UserModule {
@@ -15,16 +16,7 @@ class UserModule {
     }
 
     private initializeFile(){
-        const defaultUser = new User(
-            "Administrator",
-            "Developer",
-            "admin@invenza.pl",
-            hashPassword(process.env.DEFAULT_USER_PASSWORD!),
-            0,
-            [],
-        );
-
-        this.file.saveJsonAsFile([defaultUser.toJson()]);
+        this.file.saveJsonAsFile([userFaker.toJson()]);
     }
 
     signIn(email: string, password: string): User | null {
@@ -40,7 +32,8 @@ class UserModule {
 
     getUserById(id: number): User{
         const jsonData = this.file.getFileAsJson();
-        return jsonData.find((user: any) => user.id === id);
+        const userJson = jsonData.find((user: any) => user.id === id);
+        return User.fromJson(userJson);
     }
 }
 

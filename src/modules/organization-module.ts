@@ -1,7 +1,7 @@
 import FileManager from "../managers/file-manager";
 import {Organization} from "../models/organization";
+import {organizationFaker} from "../fakers/organization";
 import {User} from "../models/user";
-import hashPassword from "../helpers/hash-password";
 
 class OrganizationModule {
     file = new FileManager("database", "organization");
@@ -15,21 +15,25 @@ class OrganizationModule {
     }
 
     private initializeFile(){
-        const defaultCompany = new Organization(0, "Invenza", [new User(
-            "Administrator",
-            "Developer",
-            "admin@invenza.pl",
-            hashPassword(process.env.DEFAULT_USER_PASSWORD!),
-            0,
-            [],
-        )]);
-
-        this.file.saveJsonAsFile([defaultCompany.toJson()]);
+        this.file.saveJsonAsFile([organizationFaker.toJson()]);
     }
 
     getOrganizationById(organizationId: number): Organization{
         const jsonData = this.file.getFileAsJson();
         return jsonData.find((json: any) => json.id === organizationId);
+    }
+
+    getOrganizationAdmin(organizationId: number): User{
+        const jsonData = this.file.getFileAsJson();
+        const organization = jsonData.find((json: any) => json.id === organizationId);
+
+        return User.fromJson(organization.admin);
+    }
+
+    getOrganizationByUserId(userId: number): Organization {
+        const jsonData = this.file.getFileAsJson();
+        const organization = jsonData.find((json: any) => json.users.some((user: any) => user.id === userId));
+        return Organization.fromJson(organization);
     }
 }
 
