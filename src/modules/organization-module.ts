@@ -35,6 +35,15 @@ class OrganizationModule {
         const organization = jsonData.find((json: any) => json.users.some((user: any) => user.id === userId));
         return Organization.fromJson(organization);
     }
+
+    addUser(organizationId: number, user: User){
+        const jsonData = this.file.getFileAsJson();
+        const organization = jsonData.find((json: any) => json.id === organizationId);
+
+        organization.users.push(user);
+
+        this.file.saveJsonAsFile(jsonData);
+    }
 }
 
 export default OrganizationModule;
