@@ -53,9 +53,13 @@ export class TaskModule {
         return id;
     }
 
-    getTasks(): Task[] {
+    getTasks(userId: number): Task[] {
         const jsonData = this.file.getFileAsJson();
-        return jsonData.map((task: any) => Task.fromJson(task));
+        const groups = this.groupModule.getGroups(userId);
+        const groupsId = groups.map(group => group.id);
+
+        return jsonData
+            .filter((group: any) => group.groupsIdList.some((item: any) => groupsId.includes(item))).map((task: any) => Task.fromJson(task));
     }
 
     getTask(resourceId: number): Task {
