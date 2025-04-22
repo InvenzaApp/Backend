@@ -72,9 +72,9 @@ router.get('/', authMiddleware, async (req, res) => {
 
     let tasks;
     if(isUserAdmin){
-        tasks = taskModule.getTasks();
+        tasks = taskModule.getTasks(userId);
     }else{
-        tasks = taskModule.getTasks();
+        tasks = taskModule.getTasks(userId);
     }
 
     if(isDebug){
