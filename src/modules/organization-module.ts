@@ -2,9 +2,11 @@ import FileManager from "../managers/file-manager";
 import {Organization} from "../models/organization";
 import {organizationFaker} from "../fakers/organization";
 import {User} from "../models/user";
+import UserModule from "./user-module";
 
 class OrganizationModule {
     file = new FileManager("database", "organization");
+    userModule = new UserModule();
 
     constructor(createDefaultCompany: boolean = false) {
         this.file.initializeFile();
@@ -15,24 +17,25 @@ class OrganizationModule {
     }
 
     private initializeFile(){
-        this.file.saveJsonAsFile([organizationFaker.toJson()]);
+        this.file.saveJsonAsFile([organizationFaker]);
     }
 
     getOrganizationById(organizationId: number): Organization{
         const jsonData = this.file.getFileAsJson();
-        return jsonData.find((json: any) => json.id === organizationId);
+        const foundJsonOrganization = jsonData.find((json: any) => json.id === organizationId);
+        return Organization.fromJson(foundJsonOrganization);
     }
 
     getOrganizationAdmin(organizationId: number): User{
         const jsonData = this.file.getFileAsJson();
         const organization = jsonData.find((json: any) => json.id === organizationId);
 
-        return User.fromJson(organization.admin);
+        return this.userModule.getUserById(organization.adminId);
     }
 
     getOrganizationByUserId(userId: number): Organization {
         const jsonData = this.file.getFileAsJson();
-        const organization = jsonData.find((json: any) => json.users.some((user: any) => user.id === userId));
+        const organization = jsonData.find((json: any) => json.usersIdList.some((user: any) => user === userId));
         return Organization.fromJson(organization);
     }
 
@@ -40,7 +43,18 @@ class OrganizationModule {
         const jsonData = this.file.getFileAsJson();
         const organization = jsonData.find((json: any) => json.id === organizationId);
 
-        organization.users.push(user);
+        organization.usersIdList.push(user.id);
+
+        this.file.saveJsonAsFile(jsonData);
+    }
+
+    deleteUser(organizationId: number, userId: number) {
+        const jsonData = this.file.getFileAsJson();
+        const organization = jsonData.find((item: any) => item.id === organizationId);
+
+        if (organization) {
+            organization.usersIdList = organization.usersIdList.filter((id: number) => id !== userId);
+        }
 
         this.file.saveJsonAsFile(jsonData);
     }

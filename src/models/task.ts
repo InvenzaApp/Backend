@@ -1,4 +1,5 @@
-import {User, UserJson} from "./user";
+import {User} from "./user";
+import UserModule from "../modules/user-module";
 
 export type TaskJson = {
     id: number;
@@ -7,8 +8,10 @@ export type TaskJson = {
     deadline: string | null;
     groupsIdList: number[];
     createdAt: string;
-    createdBy: UserJson;
+    createdById: number;
 }
+
+const userModule = new UserModule();
 
 export class Task{
     constructor(
@@ -29,7 +32,7 @@ export class Task{
             json.deadline,
             json.groupsIdList,
             json.createdAt,
-            User.fromJson(json.createdBy),
+            userModule.getUserById(json.createdById),
         );
     }
 
@@ -41,7 +44,7 @@ export class Task{
             deadline: this.deadline,
             groupsIdList: this.groupsIdList,
             createdAt: this.createdAt,
-            createdBy: this.createdBy.toJson(),
+            createdById: this.createdBy.id,
         }
     }
 }

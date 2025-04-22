@@ -75,6 +75,7 @@ export class GroupModule{
         const jsonData = this.file.getFileAsJson();
         const filteredData = jsonData.filter((item: any) => item.id !== groupId);
         this.file.saveJsonAsFile(filteredData);
+        this.userModule.deleteGroupFromUsers(groupId);
     }
 
     getGroupNameById(id: number): string{

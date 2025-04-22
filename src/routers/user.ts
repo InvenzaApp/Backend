@@ -106,7 +106,10 @@ router.delete('/:id', authMiddleware, (req, res) => {
 
    const resourceId = Number(req.params.id);
 
+   const organization = organizationModule.getOrganizationByUserId(resourceId);
+
    userModule.deleteUser(resourceId);
+   organizationModule.deleteUser(organization.id, resourceId);
 
    performSuccessResponse(res, resourceId, token);
 });
