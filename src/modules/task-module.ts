@@ -6,10 +6,12 @@ import {Group} from "../models/group";
 import {taskFaker} from "../fakers/task";
 import {User} from "../models/user";
 import {DateTime} from "../helpers/date-time";
+import OrganizationModule from "./organization-module";
 
 export class TaskModule {
     file = new FileManager("database", "tasks");
     groupModule = new GroupModule();
+    organizationModule = new OrganizationModule();
 
     constructor(createDefaultTasks: boolean = false) {
         this.file.initializeFile();
@@ -56,10 +58,23 @@ export class TaskModule {
     getTasks(userId: number): Task[] {
         const jsonData = this.file.getFileAsJson();
         const groups = this.groupModule.getGroups(userId);
+        const organization = this.organizationModule.getOrganizationByUserId(userId);
+        const admin = this.organizationModule.getOrganizationAdmin(organization.id);
+        const isAdmin = admin.id === userId;
+
         const groupsId = groups.map(group => group.id);
 
-        return jsonData
+        const filteredData =  jsonData
             .filter((group: any) => group.groupsIdList.some((item: any) => groupsId.includes(item))).map((task: any) => Task.fromJson(task));
+
+        if(!isAdmin){
+            return filteredData;
+        }
+
+        const unassignedTasks = jsonData.filter((task: any) => Array.isArray(task.groupsIdList) && task.groupsIdList.length === 0)
+            .map((task: any) => Task.fromJson(task));
+
+        return [...unassignedTasks, ...filteredData];
     }
 
     getTask(resourceId: number): Task {
