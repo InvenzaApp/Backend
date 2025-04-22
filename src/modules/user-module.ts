@@ -39,6 +39,24 @@ class UserModule {
         return User.fromJson(userJson);
     }
 
+    getUsersById(idList: number[]): User[] {
+        const jsonData = this.file.getFileAsJson();
+        return jsonData.filter((user: any) => idList.includes(user.id)).map((user: any) => User.fromJson(user));
+    }
+
+    deleteGroupFromUsers(groupId: number): void {
+        const jsonData = this.file.getFileAsJson();
+
+        const updatedUsers = jsonData.map((user: any) => {
+            if (Array.isArray(user.groupsIdList)) {
+                user.groupsIdList = user.groupsIdList.filter((id: number) => id !== groupId);
+            }
+            return user;
+        });
+
+        this.file.saveJsonAsFile(updatedUsers);
+    }
+
     getUsers(): User[] {
         const jsonData = this.file.getFileAsJson();
         return jsonData.map((user: any) => User.fromJson(user));

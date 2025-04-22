@@ -1,13 +1,12 @@
-import {Task} from "../models/task";
 import {userFaker} from "./user";
 import {DateTime} from "../helpers/date-time";
 
-export const taskFaker = new Task(
-    0,
-    "Przykładowe zadanie",
-    "Przykładowy opis podstawowego zadania",
-    null,
-    [0],
-    DateTime.getFullTimestamp(),
-    userFaker,
-);
+export const taskFaker = {
+    'id': 0,
+    'title': "Przykładowe zadanie",
+    'description': "Przykładowy opis podstawowego zadania",
+    'deadline': null,
+    'groupsIdList': [0],
+    'createdAt': DateTime.getFullTimestamp(),
+    'createdById': userFaker.id,
+};

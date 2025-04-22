@@ -7,11 +7,13 @@ import {taskFaker} from "../fakers/task";
 import {User} from "../models/user";
 import {DateTime} from "../helpers/date-time";
 import OrganizationModule from "./organization-module";
+import UserModule from "./user-module";
 
 export class TaskModule {
     file = new FileManager("database", "tasks");
     groupModule = new GroupModule();
     organizationModule = new OrganizationModule();
+    userModule = new UserModule();
 
     constructor(createDefaultTasks: boolean = false) {
         this.file.initializeFile();
@@ -22,7 +24,7 @@ export class TaskModule {
     }
 
     private initializeFile() {
-        this.file.saveJsonAsFile([taskFaker.toJson()]);
+        this.file.saveJsonAsFile([taskFaker]);
     }
 
     addTask(title: string, description: string | null, deadline: string | null, groupsIdList: number[], createdBy: User): number {
@@ -91,6 +93,7 @@ export class TaskModule {
         })
 
         task.groupsList = tmpList;
+        task.createdBy = this.userModule.getUserById(task.createdById);
 
         return task;
     }
