@@ -1,9 +1,8 @@
-import {Organization} from "../models/organization";
 import {userFaker} from "./user";
 
-export const organizationFaker = new Organization(
-    0,
-    "Invenza",
-    [userFaker],
-    userFaker,
-);
+export const organizationFaker = {
+    'id': 0,
+    'name': "Invenza",
+    'usersIdList': [userFaker.id],
+    'adminId': userFaker.id,
+};

@@ -1,11 +1,14 @@
-import {User, UserJson} from "./user";
+import {User} from "./user";
+import UserModule from "../modules/user-module";
 
 export type OrganizationJson = {
     id: number;
     name: string;
-    users: UserJson[];
-    admin: UserJson;
+    usersIdList: number[];
+    adminId: number;
 }
+
+const userModule = new UserModule();
 
 export class Organization {
     constructor(
@@ -20,8 +23,8 @@ export class Organization {
         return new Organization(
             json.id,
             json.name,
-            json.users.map(userJson => User.fromJson(userJson)),
-            User.fromJson(json.admin),
+            userModule.getUsersById(json.usersIdList),
+            userModule.getUserById(json.adminId),
         );
     }
 
@@ -29,8 +32,8 @@ export class Organization {
         return {
             id: this.id,
             name: this.name,
-            users: this.users.map(userJson => User.fromJson(userJson)),
-            admin: this.admin.toJson(),
+            usersIdList: this.users.map(userJson => userJson.id),
+            adminId: this.admin.id,
         }
     }
 }

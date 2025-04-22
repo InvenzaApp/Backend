@@ -20,10 +20,12 @@ export class GroupModule{
         this.file.saveJsonAsFile([groupFaker.toJson()]);
     }
 
-    getGroups(): Group[]{
+    getGroups(userId: number): Group[]{
         const jsonData = this.file.getFileAsJson();
 
-        return jsonData.map((group: any) => Group.fromJson(group));
+        return jsonData
+            .filter((group: any) => group.usersIdList.some((item: any) => item == userId))
+            .map((group: any) => Group.fromJson(group));
     }
 
     addGroup(name: string, usersIdList: number[]): number {
@@ -73,6 +75,7 @@ export class GroupModule{
         const jsonData = this.file.getFileAsJson();
         const filteredData = jsonData.filter((item: any) => item.id !== groupId);
         this.file.saveJsonAsFile(filteredData);
+        this.userModule.deleteGroupFromUsers(groupId);
     }
 
     getGroupNameById(id: number): string{

@@ -6,10 +6,14 @@ import {Group} from "../models/group";
 import {taskFaker} from "../fakers/task";
 import {User} from "../models/user";
 import {DateTime} from "../helpers/date-time";
+import OrganizationModule from "./organization-module";
+import UserModule from "./user-module";
 
 export class TaskModule {
     file = new FileManager("database", "tasks");
     groupModule = new GroupModule();
+    organizationModule = new OrganizationModule();
+    userModule = new UserModule();
 
     constructor(createDefaultTasks: boolean = false) {
         this.file.initializeFile();
@@ -20,7 +24,7 @@ export class TaskModule {
     }
 
     private initializeFile() {
-        this.file.saveJsonAsFile([taskFaker.toJson()]);
+        this.file.saveJsonAsFile([taskFaker]);
     }
 
     addTask(title: string, description: string | null, deadline: string | null, groupsIdList: number[], createdBy: User): number {
@@ -53,9 +57,26 @@ export class TaskModule {
         return id;
     }
 
-    getTasks(): Task[] {
+    getTasks(userId: number): Task[] {
         const jsonData = this.file.getFileAsJson();
-        return jsonData.map((task: any) => Task.fromJson(task));
+        const groups = this.groupModule.getGroups(userId);
+        const organization = this.organizationModule.getOrganizationByUserId(userId);
+        const admin = this.organizationModule.getOrganizationAdmin(organization.id);
+        const isAdmin = admin.id === userId;
+
+        const groupsId = groups.map(group => group.id);
+
+        const filteredData =  jsonData
+            .filter((group: any) => group.groupsIdList.some((item: any) => groupsId.includes(item))).map((task: any) => Task.fromJson(task));
+
+        if(!isAdmin){
+            return filteredData;
+        }
+
+        const unassignedTasks = jsonData.filter((task: any) => Array.isArray(task.groupsIdList) && task.groupsIdList.length === 0)
+            .map((task: any) => Task.fromJson(task));
+
+        return [...unassignedTasks, ...filteredData];
     }
 
     getTask(resourceId: number): Task {
@@ -72,6 +93,7 @@ export class TaskModule {
         })
 
         task.groupsList = tmpList;
+        task.createdBy = this.userModule.getUserById(task.createdById);
 
         return task;
     }

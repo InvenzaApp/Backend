@@ -19,7 +19,7 @@ router.get('/', authMiddleware, async (req, res) => {
     const { userId } = (req as any).user;
     const token = tokenManager.getAccessToken(userId);
 
-    const groupsList = groupModule.getGroups();
+    const groupsList = groupModule.getGroups(userId);
 
     if(isDebug){
         await delay(delayTime);
