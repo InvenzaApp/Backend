@@ -91,7 +91,7 @@ router.put('/:id', authMiddleware, (req, res) => {
    const resourceId = Number(req.params.id);
    const { name, lastname, email, groupsIdList } = req.body;
 
-   if(!name || !lastname || !email || !groupsIdList) {
+   if(!name || !lastname || !email) {
        performFailureResponse(res, INVALID_CREDENTIALS);
        return;
    }
