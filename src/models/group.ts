@@ -1,20 +1,20 @@
 export type GroupJson = {
     id: number;
-    name: string;
+    title: string;
     usersIdList: number[];
 }
 
 export class Group{
     constructor(
         public id: number,
-        public name: string,
+        public title: string,
         public usersIdList: number[],
     ) {}
 
     static fromJson(json: GroupJson): Group {
         return new Group(
             json.id,
-            json.name,
+            json.title,
             json.usersIdList,
         );
     }
@@ -22,7 +22,7 @@ export class Group{
     toJson(): GroupJson{
         return {
             id: this.id,
-            name: this.name,
+            title: this.title,
             usersIdList: this.usersIdList,
         }
     }

@@ -3,7 +3,7 @@ import UserModule from "../modules/user-module";
 
 export type OrganizationJson = {
     id: number;
-    name: string;
+    title: string;
     usersIdList: number[];
     adminId: number;
 }
@@ -13,7 +13,7 @@ const userModule = new UserModule();
 export class Organization {
     constructor(
         public id: number,
-        public name: string,
+        public title: string,
         public users: User[],
         public admin: User,
     ) {
@@ -22,7 +22,7 @@ export class Organization {
     static fromJson(json: OrganizationJson): Organization {
         return new Organization(
             json.id,
-            json.name,
+            json.title,
             userModule.getUsersById(json.usersIdList),
             userModule.getUserById(json.adminId),
         );
@@ -31,7 +31,7 @@ export class Organization {
     toJson(): OrganizationJson {
         return {
             id: this.id,
-            name: this.name,
+            title: this.title,
             usersIdList: this.users.map(userJson => userJson.id),
             adminId: this.admin.id,
         }
