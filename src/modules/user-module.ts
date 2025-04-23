@@ -36,6 +36,7 @@ class UserModule {
     getUserById(id: number): User {
         const jsonData = this.file.getFileAsJson();
         const userJson = jsonData.find((user: any) => user.id === id);
+
         return User.fromJson(userJson);
     }
 
@@ -99,7 +100,7 @@ class UserModule {
         user.lastname = lastname;
         user.title = `${name} ${lastname}`;
         user.email = email;
-        user.groups = groupsIdList ?? [];
+        user.groupsIdList = groupsIdList ?? [];
 
         this.file.saveJsonAsFile(jsonData);
     }
