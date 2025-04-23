@@ -63,7 +63,7 @@ class UserModule {
         return jsonData.map((user: any) => User.fromJson(user));
     }
 
-    createUser(organizationId: number, name: string, lastname: string, email: string, password: string, groupsIdList: number[] | null): User | string {
+    createUser(organizationId: number, name: string, lastname: string, email: string, password: string, groupsIdList: number[] | null, permissions: string[] | null): User | string {
         const jsonData = this.file.getFileAsJson();
 
         const userExists = jsonData.find((user: any) => user.email === email);
@@ -83,6 +83,7 @@ class UserModule {
             hashPassword(password), 
             organizationId, 
             groupsIdList ?? [],
+            permissions ?? [],
         );
 
         jsonData.push(newUser.toJson());
@@ -92,7 +93,7 @@ class UserModule {
         return newUser;
     }
 
-    updateUser(userId: number, name: string, lastname: string, email: string, groupsIdList: number[] | null){
+    updateUser(userId: number, name: string, lastname: string, email: string, groupsIdList: number[] | null, permissions: string[] | null){
         const jsonData = this.file.getFileAsJson();
         const user = jsonData.find((item: any) => item.id === userId);
 
@@ -101,6 +102,7 @@ class UserModule {
         user.title = `${name} ${lastname}`;
         user.email = email;
         user.groupsIdList = groupsIdList ?? [];
+        user.permissions = permissions ?? [];
 
         this.file.saveJsonAsFile(jsonData);
     }

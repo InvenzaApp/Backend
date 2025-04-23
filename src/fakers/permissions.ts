@@ -1,0 +1,17 @@
+export const adminPermissions = [
+  "addUser",
+  "listUser",
+  "showUser",
+  "updateUser",
+  "deleteUser",
+  "addGroup",
+  "listGroup",
+  "showGroup",
+  "updateGroup",
+  "deleteGroup",
+  "addTask",
+  "listTask",
+  "showTask",
+  "updateTask",
+  "deleteTask",
+];
