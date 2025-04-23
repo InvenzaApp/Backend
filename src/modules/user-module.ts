@@ -75,7 +75,13 @@ class UserModule {
 
         const newUser = new User(
             newId,
-            name, lastname, email, hashPassword(password), organizationId, groupsIdList ?? [],
+            name, 
+            lastname,
+            `${name} ${lastname}`,
+            email, 
+            hashPassword(password), 
+            organizationId, 
+            groupsIdList ?? [],
         );
 
         jsonData.push(newUser.toJson());
@@ -91,6 +97,7 @@ class UserModule {
 
         user.name = name;
         user.lastname = lastname;
+        user.title = `${name} ${lastname}`;
         user.email = email;
         user.groups = groupsIdList ?? [];
 
