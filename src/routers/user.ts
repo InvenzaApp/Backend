@@ -85,6 +85,23 @@ router.post('/', authMiddleware, (req, res) => {
    }
 });
 
+router.post('/update-password', authMiddleware, (req, res) => {
+    const { userId } = (req as any).user;
+    const token = tokenManager.getAccessToken(userId);
+
+    const { oldPassword, newPassword, confirmNewPassword } = req.body;
+
+    if(!oldPassword || !newPassword || !confirmNewPassword){
+        performFailureResponse(res, INVALID_REQUEST_PARAMETERS);
+        return;
+    }
+
+    const success = userModule.updatePassword(userId, oldPassword, newPassword, confirmNewPassword);
+
+    performSuccessResponse(res, success, token);
+
+});
+
 router.put('/:id', authMiddleware, (req, res) => {
    const { userId } = (req as any).user;
    const token = tokenManager.getAccessToken(userId);

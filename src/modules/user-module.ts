@@ -119,6 +119,20 @@ class UserModule {
 
         this.file.saveJsonAsFile(newData);
     }
+
+    updatePassword(userId: number, oldPassword: string, newPassword: string, confirmNewPassword: string): boolean{
+        const jsonData = this.file.getFileAsJson();
+        const user = jsonData.find((item: any) => item.id === userId);
+
+        if(hashPassword(oldPassword) != user.password){
+            return false;
+        }
+
+        user.password = hashPassword(newPassword);
+
+        this.file.saveJsonAsFile(jsonData);
+        return true;
+    }
 }
 
 export default UserModule;
