@@ -40,7 +40,7 @@ router.post('/', authMiddleware, async (req, res) => {
 
 router.put('/:id', authMiddleware, async (req, res) => {
     const id = Number(req.params.id);
-    const { title, description, deadline, groupsIdList } = req.body;
+    const { title, description, deadline, groupsIdList, status } = req.body;
     const { userId } = (req as any).user;
     const token = tokenManager.getAccessToken(userId);
 
@@ -53,7 +53,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
         return;
     }
 
-    const taskId = taskModule.updateTask(id, title, description, deadline, groupsIdList);
+    const taskId = taskModule.updateTask(id, title, description, deadline, groupsIdList, status);
 
     if(isDebug){
         await delay(delayTime);

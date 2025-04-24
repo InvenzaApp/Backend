@@ -2,10 +2,12 @@ export type UserJson = {
     id: number;
     name: string;
     lastname: string;
+    title: string;
     email: string;
     password: string;
     organizationId: number;
     groupsIdList: number[];
+    permissions: string[];
 }
 
 export class User{
@@ -13,10 +15,12 @@ export class User{
         public id: number,
         public name: string,
         public lastname: string,
+        public title: string,
         public email: string,
         public password: string,
         public organizationId: number,
         public groupsIdList: number[],
+        public permissions: string[],
     ) {}
 
     static fromJson(json: UserJson): User {
@@ -24,10 +28,12 @@ export class User{
             json.id,
             json.name,
             json.lastname,
+            json.title,
             json.email,
             json.password,
             json.organizationId,
             json.groupsIdList,
+            json.permissions,
         );
     }
 
@@ -36,10 +42,12 @@ export class User{
             id: this.id,
             name: this.name,
             lastname: this.lastname,
+            title: this.title,
             email: this.email,
             password: this.password,
             organizationId: this.organizationId,
             groupsIdList: this.groupsIdList,
+            permissions: this.permissions,
         }
     }
 }

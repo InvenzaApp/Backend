@@ -65,7 +65,7 @@ router.post('/', authMiddleware, (req, res) => {
    const { userId } = (req as any).user;
    const token = tokenManager.getAccessToken(userId);
 
-   const { name, lastname, email, password, groupsIdList } = req.body;
+   const { name, lastname, email, password, groupsIdList, permissions } = req.body;
 
    if(!name || !lastname || !email || !password) {
        performFailureResponse(res, INVALID_CREDENTIALS);
@@ -74,7 +74,7 @@ router.post('/', authMiddleware, (req, res) => {
 
    const organization = organizationModule.getOrganizationByUserId(userId);
 
-   const data = userModule.createUser(organization.id, name, lastname, email, password, groupsIdList);
+   const data = userModule.createUser(organization.id, name, lastname, email, password, groupsIdList, permissions);
 
 
    if(typeof data === "string"){
@@ -85,18 +85,35 @@ router.post('/', authMiddleware, (req, res) => {
    }
 });
 
+router.post('/update-password', authMiddleware, (req, res) => {
+    const { userId } = (req as any).user;
+    const token = tokenManager.getAccessToken(userId);
+
+    const { oldPassword, newPassword, confirmNewPassword } = req.body;
+
+    if(!oldPassword || !newPassword || !confirmNewPassword){
+        performFailureResponse(res, INVALID_REQUEST_PARAMETERS);
+        return;
+    }
+
+    const success = userModule.updatePassword(userId, oldPassword, newPassword, confirmNewPassword);
+
+    performSuccessResponse(res, success, token);
+
+});
+
 router.put('/:id', authMiddleware, (req, res) => {
    const { userId } = (req as any).user;
    const token = tokenManager.getAccessToken(userId);
    const resourceId = Number(req.params.id);
-   const { name, lastname, email, groupsIdList } = req.body;
+   const { name, lastname, email, groupsIdList, permissions } = req.body;
 
-   if(!name || !lastname || !email || !groupsIdList) {
+   if(!name || !lastname || !email) {
        performFailureResponse(res, INVALID_CREDENTIALS);
        return;
    }
 
-   userModule.updateUser(resourceId, name, lastname, email, groupsIdList);
+   userModule.updateUser(resourceId, name, lastname, email, groupsIdList, permissions);
    performSuccessResponse(res, resourceId, token);
 });
 

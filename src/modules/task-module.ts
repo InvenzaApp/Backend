@@ -3,7 +3,7 @@ import {Task} from "../models/task";
 import IdGetter from "../helpers/id-getter";
 import {GroupModule} from "./group-module";
 import {Group} from "../models/group";
-import {taskFaker} from "../fakers/task";
+import {taskFaker1, taskFaker2, taskFaker3, taskFaker4, taskFaker5, taskFaker6} from "../fakers/task";
 import {User} from "../models/user";
 import {DateTime} from "../helpers/date-time";
 import OrganizationModule from "./organization-module";
@@ -24,14 +24,21 @@ export class TaskModule {
     }
 
     private initializeFile() {
-        this.file.saveJsonAsFile([taskFaker]);
+        this.file.saveJsonAsFile([
+            taskFaker1,
+            taskFaker2,
+            taskFaker3,
+            taskFaker4,
+            taskFaker5,
+            taskFaker6,
+        ]);
     }
 
     addTask(title: string, description: string | null, deadline: string | null, groupsIdList: number[], createdBy: User): number {
         const jsonData = this.file.getFileAsJson();
         const newId = IdGetter(jsonData);
 
-        const newTask = new Task(newId, title, description, deadline, groupsIdList, DateTime.getFullTimestamp(), createdBy);
+        const newTask = new Task(newId, title, description, deadline, groupsIdList, DateTime.getFullTimestamp(), createdBy, "toDo");
 
         jsonData.push(newTask.toJson());
 
@@ -39,7 +46,7 @@ export class TaskModule {
         return newId;
     }
 
-    updateTask(id: number, title: string, description: string | null, deadline: string | null, groupsIdList: number[]): number {
+    updateTask(id: number, title: string, description: string | null, deadline: string | null, groupsIdList: number[], status: string): number {
         const jsonData = this.file.getFileAsJson();
         const task = jsonData.find((item: any) => item.id === id);
 
@@ -49,8 +56,9 @@ export class TaskModule {
 
         task.title = title;
         task.description = description;
-        task.deadline = deadline;
+        task.deadline = deadline; 
         task.groupsIdList = groupsIdList;
+        task.status = status;
 
         this.file.saveJsonAsFile(jsonData);
 

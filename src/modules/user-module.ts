@@ -1,7 +1,7 @@
 import FileManager from "../managers/file-manager";
 import hashPassword from "../helpers/hash-password";
 import {User} from "../models/user";
-import {userFaker} from "../fakers/user";
+import {adminFaker, moderatorFaker, pmFaker, taskPreviewFaker, workerFaker} from "../fakers/user";
 import {USER_EXISTS} from "../helpers/response-codes";
 import IdGetter from "../helpers/id-getter";
 
@@ -19,7 +19,13 @@ class UserModule {
     }
 
     private initializeFile() {
-        this.file.saveJsonAsFile([userFaker.toJson()]);
+        this.file.saveJsonAsFile([
+            adminFaker.toJson(),
+            moderatorFaker.toJson(),
+            pmFaker.toJson(),
+            workerFaker.toJson(),
+            taskPreviewFaker.toJson(),
+        ]);
     }
 
     signIn(email: string, password: string): User | null {
@@ -36,6 +42,7 @@ class UserModule {
     getUserById(id: number): User {
         const jsonData = this.file.getFileAsJson();
         const userJson = jsonData.find((user: any) => user.id === id);
+
         return User.fromJson(userJson);
     }
 
@@ -62,7 +69,7 @@ class UserModule {
         return jsonData.map((user: any) => User.fromJson(user));
     }
 
-    createUser(organizationId: number, name: string, lastname: string, email: string, password: string, groupsIdList: number[] | null): User | string {
+    createUser(organizationId: number, name: string, lastname: string, email: string, password: string, groupsIdList: number[] | null, permissions: string[] | null): User | string {
         const jsonData = this.file.getFileAsJson();
 
         const userExists = jsonData.find((user: any) => user.email === email);
@@ -75,7 +82,14 @@ class UserModule {
 
         const newUser = new User(
             newId,
-            name, lastname, email, hashPassword(password), organizationId, groupsIdList ?? [],
+            name, 
+            lastname,
+            `${name} ${lastname}`,
+            email, 
+            hashPassword(password), 
+            organizationId, 
+            groupsIdList ?? [],
+            permissions ?? [],
         );
 
         jsonData.push(newUser.toJson());
@@ -85,14 +99,16 @@ class UserModule {
         return newUser;
     }
 
-    updateUser(userId: number, name: string, lastname: string, email: string, groupsIdList: number[] | null){
+    updateUser(userId: number, name: string, lastname: string, email: string, groupsIdList: number[] | null, permissions: string[] | null){
         const jsonData = this.file.getFileAsJson();
         const user = jsonData.find((item: any) => item.id === userId);
 
         user.name = name;
         user.lastname = lastname;
+        user.title = `${name} ${lastname}`;
         user.email = email;
-        user.groups = groupsIdList ?? [];
+        user.groupsIdList = groupsIdList ?? [];
+        user.permissions = permissions ?? [];
 
         this.file.saveJsonAsFile(jsonData);
     }
@@ -102,6 +118,20 @@ class UserModule {
         const newData = jsonData.filter((item: any) => item.id !== id);
 
         this.file.saveJsonAsFile(newData);
+    }
+
+    updatePassword(userId: number, oldPassword: string, newPassword: string, confirmNewPassword: string): boolean{
+        const jsonData = this.file.getFileAsJson();
+        const user = jsonData.find((item: any) => item.id === userId);
+
+        if(hashPassword(oldPassword) != user.password){
+            return false;
+        }
+
+        user.password = hashPassword(newPassword);
+
+        this.file.saveJsonAsFile(jsonData);
+        return true;
     }
 }
 
