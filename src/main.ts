@@ -31,10 +31,12 @@ app.get('/', (req, res) => {
 })
 
 const initialize = () => {
-   new UserModule(true);
-   new OrganizationModule(true);
-   new TaskModule(true);
-   new GroupModule(true);
+   const isDebug = process.env.DEBUG == "true";
+
+   new UserModule(isDebug);
+   new OrganizationModule(isDebug);
+   new TaskModule(isDebug);
+   new GroupModule(isDebug);
 }
 
 const sslOptions = {
