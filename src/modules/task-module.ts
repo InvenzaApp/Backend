@@ -3,7 +3,7 @@ import {Task} from "../models/task";
 import IdGetter from "../helpers/id-getter";
 import {GroupModule} from "./group-module";
 import {Group} from "../models/group";
-import {taskFaker} from "../fakers/task";
+import {taskFaker1, taskFaker2, taskFaker3, taskFaker4, taskFaker5, taskFaker6} from "../fakers/task";
 import {User} from "../models/user";
 import {DateTime} from "../helpers/date-time";
 import OrganizationModule from "./organization-module";
@@ -24,7 +24,14 @@ export class TaskModule {
     }
 
     private initializeFile() {
-        this.file.saveJsonAsFile([taskFaker]);
+        this.file.saveJsonAsFile([
+            taskFaker1,
+            taskFaker2,
+            taskFaker3,
+            taskFaker4,
+            taskFaker5,
+            taskFaker6,
+        ]);
     }
 
     addTask(title: string, description: string | null, deadline: string | null, groupsIdList: number[], createdBy: User): number {

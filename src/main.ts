@@ -3,6 +3,7 @@ import userRouter from './routers/user';
 import tasksRouter from './routers/task';
 import organizationRouter from './routers/organization';
 import groupsRouter from './routers/group';
+import permissionRouter from './routers/permission';
 import UserModule from './modules/user-module';
 import OrganizationModule from "./modules/organization-module";
 import {TaskModule} from "./modules/task-module";
@@ -23,6 +24,7 @@ app.use('/api/users', userRouter);
 app.use('/api/tasks', tasksRouter);
 app.use('/api/organization', organizationRouter);
 app.use('/api/groups', groupsRouter);
+app.use('/api/permissions', permissionRouter);
 
 app.get('/', (req, res) => {
    res.send('Hello, world!');

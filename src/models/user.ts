@@ -7,6 +7,7 @@ export type UserJson = {
     password: string;
     organizationId: number;
     groupsIdList: number[];
+    permissions: string[];
 }
 
 export class User{
@@ -19,6 +20,7 @@ export class User{
         public password: string,
         public organizationId: number,
         public groupsIdList: number[],
+        public permissions: string[],
     ) {}
 
     static fromJson(json: UserJson): User {
@@ -31,6 +33,7 @@ export class User{
             json.password,
             json.organizationId,
             json.groupsIdList,
+            json.permissions,
         );
     }
 
@@ -44,6 +47,7 @@ export class User{
             password: this.password,
             organizationId: this.organizationId,
             groupsIdList: this.groupsIdList,
+            permissions: this.permissions,
         }
     }
 }
