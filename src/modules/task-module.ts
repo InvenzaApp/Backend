@@ -38,7 +38,7 @@ export class TaskModule {
         const jsonData = this.file.getFileAsJson();
         const newId = IdGetter(jsonData);
 
-        const newTask = new Task(newId, title, description, deadline, groupsIdList, DateTime.getFullTimestamp(), createdBy);
+        const newTask = new Task(newId, title, description, deadline, groupsIdList, DateTime.getFullTimestamp(), createdBy, "toDo");
 
         jsonData.push(newTask.toJson());
 
@@ -46,7 +46,7 @@ export class TaskModule {
         return newId;
     }
 
-    updateTask(id: number, title: string, description: string | null, deadline: string | null, groupsIdList: number[]): number {
+    updateTask(id: number, title: string, description: string | null, deadline: string | null, groupsIdList: number[], status: string): number {
         const jsonData = this.file.getFileAsJson();
         const task = jsonData.find((item: any) => item.id === id);
 
@@ -56,8 +56,9 @@ export class TaskModule {
 
         task.title = title;
         task.description = description;
-        task.deadline = deadline;
+        task.deadline = deadline; 
         task.groupsIdList = groupsIdList;
+        task.status = status;
 
         this.file.saveJsonAsFile(jsonData);
 
