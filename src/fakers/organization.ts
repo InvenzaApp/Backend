@@ -1,8 +1,8 @@
-import {userFaker} from "./user";
+import {adminFaker, moderatorFaker, pmFaker, taskPreviewFaker, workerFaker} from "./user";
 
 export const organizationFaker = {
     'id': 0,
     'title': "Invenza",
-    'usersIdList': [userFaker.id],
-    'adminId': userFaker.id,
+    'usersIdList': [adminFaker.id, moderatorFaker.id, pmFaker.id, workerFaker.id, taskPreviewFaker.id],
+    'adminId': adminFaker.id,
 };

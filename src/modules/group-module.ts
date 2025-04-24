@@ -1,7 +1,7 @@
 import FileManager from "../managers/file-manager";
 import {Group} from "../models/group";
 import IdGetter from "../helpers/id-getter";
-import {groupFaker} from "../fakers/group";
+import {adminGroupFaker, moderatorGroupFaker, pmGroupFaker, taskPreviewGroupFaker, workerGroupFaker} from "../fakers/group";
 import UserModule from "./user-module";
 import {User} from "../models/user";
 
@@ -17,7 +17,13 @@ export class GroupModule{
     }
 
     private initializeFile(){
-        this.file.saveJsonAsFile([groupFaker.toJson()]);
+        this.file.saveJsonAsFile([
+            adminGroupFaker.toJson(),
+            moderatorGroupFaker.toJson(),
+            pmGroupFaker.toJson(),
+            workerGroupFaker.toJson(),
+            taskPreviewGroupFaker.toJson(),
+        ]);
     }
 
     getGroups(userId: number): Group[]{

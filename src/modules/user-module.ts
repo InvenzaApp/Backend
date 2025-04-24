@@ -1,7 +1,7 @@
 import FileManager from "../managers/file-manager";
 import hashPassword from "../helpers/hash-password";
 import {User} from "../models/user";
-import {userFaker} from "../fakers/user";
+import {adminFaker, moderatorFaker, pmFaker, taskPreviewFaker, workerFaker} from "../fakers/user";
 import {USER_EXISTS} from "../helpers/response-codes";
 import IdGetter from "../helpers/id-getter";
 
@@ -19,7 +19,13 @@ class UserModule {
     }
 
     private initializeFile() {
-        this.file.saveJsonAsFile([userFaker.toJson()]);
+        this.file.saveJsonAsFile([
+            adminFaker.toJson(),
+            moderatorFaker.toJson(),
+            pmFaker.toJson(),
+            workerFaker.toJson(),
+            taskPreviewFaker.toJson(),
+        ]);
     }
 
     signIn(email: string, password: string): User | null {
