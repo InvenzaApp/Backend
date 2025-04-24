@@ -13,19 +13,23 @@ class UserModule {
     constructor(createDefaultUser: boolean = false) {
         this.file.initializeFile();
 
-        if (createDefaultUser && this.file.isEmpty()) {
+        if (this.file.isEmpty()) {
             this.initializeFile();
         }
     }
 
-    private initializeFile() {
-        this.file.saveJsonAsFile([
-            adminFaker.toJson(),
-            moderatorFaker.toJson(),
-            pmFaker.toJson(),
-            workerFaker.toJson(),
-            taskPreviewFaker.toJson(),
-        ]);
+    private initializeFile(createDefaultUser: boolean = false) {
+        if(createDefaultUser){
+            this.file.saveJsonAsFile([
+                adminFaker.toJson(),
+                moderatorFaker.toJson(),
+                pmFaker.toJson(),
+                workerFaker.toJson(),
+                taskPreviewFaker.toJson(),
+            ]);
+        }else{
+            this.file.saveJsonAsFile([adminFaker.toJson()]);
+        }
     }
 
     signIn(email: string, password: string): User | null {
