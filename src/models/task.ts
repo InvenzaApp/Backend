@@ -9,6 +9,7 @@ export type TaskJson = {
     groupsIdList: number[];
     createdAt: string;
     createdById: number;
+    status: string;
 }
 
 const userModule = new UserModule();
@@ -22,6 +23,7 @@ export class Task{
         public groupsIdList: number[],
         public createdAt: string,
         public createdBy: User,
+        public status: string,
     ) {}
 
     static fromJson(json: TaskJson): Task {
@@ -33,6 +35,7 @@ export class Task{
             json.groupsIdList,
             json.createdAt,
             userModule.getUserById(json.createdById),
+            json.status,
         );
     }
 
@@ -45,6 +48,7 @@ export class Task{
             groupsIdList: this.groupsIdList,
             createdAt: this.createdAt,
             createdById: this.createdBy.id,
+            status: this.status,
         }
     }
 }

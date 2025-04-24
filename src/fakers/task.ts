@@ -10,6 +10,7 @@ export const taskFaker1 = {
     'groupsIdList': [0],
     'createdAt': DateTime.getFullTimestamp(),
     'createdById': adminFaker.id,
+    'status': 'done',
 };
 
 export const taskFaker2 = {
@@ -20,6 +21,7 @@ export const taskFaker2 = {
     'groupsIdList': [1],
     'createdAt': DateTime.getFullTimestamp(),
     'createdById': moderatorFaker.id,
+    'status': 'inProgress',
 };
 
 export const taskFaker3 = {
@@ -30,6 +32,7 @@ export const taskFaker3 = {
     'groupsIdList': [0, 1, 2, 3],
     'createdAt': DateTime.getFullTimestamp(),
     'createdById': adminFaker.id,
+    'status': 'waiting',
 };
 
 export const taskFaker4 = {
@@ -40,6 +43,7 @@ export const taskFaker4 = {
     'groupsIdList': [0, 2, 3],
     'createdAt': DateTime.getFullTimestamp(),
     'createdById': moderatorFaker.id,
+    'status': 'testing',
 };
 
 export const taskFaker5 = {
@@ -50,6 +54,7 @@ export const taskFaker5 = {
     'groupsIdList': [0, 1, 2, 3],
     'createdAt': DateTime.getFullTimestamp(),
     'createdById': adminFaker.id,
+    'status': 'review',
 };
 
 export const taskFaker6 = {
@@ -60,4 +65,5 @@ export const taskFaker6 = {
     'groupsIdList': [0, 1, 2, 3],
     'createdAt': DateTime.getFullTimestamp(),
     'createdById': moderatorFaker.id,
+    'status': 'toDo',
 };
