@@ -3,19 +3,20 @@ import UserModule from "../modules/user-module";
 import {INVALID_CREDENTIALS, INVALID_REQUEST_PARAMETERS} from "../helpers/response-codes";
 import {performFailureResponse, performSuccessResponse} from "../helpers/responses";
 import {TokenManager} from "../managers/token-manager";
-import {delay} from "../helpers/delay";
 import {authMiddleware} from "../authorization/api_authorization";
 import OrganizationModule from "../modules/organization-module";
+import { GroupModule } from "../modules/group-module";
 require("dotenv").config();
 
 const router = Router();
 const tokenManager = new TokenManager();
+const groupModule = new GroupModule();
 const userModule = new UserModule();
 const isDebug = process.env.DEBUG;
 const delayTime = (process.env.DELAY || 300) as number;
 const organizationModule = new OrganizationModule();
 
-router.post('/sign-in', async (req, res) => {
+router.post('/sign-in', (req, res) => {
     const { email, password } = req.body;
 
     if(!email || !password) {
@@ -26,19 +27,12 @@ router.post('/sign-in', async (req, res) => {
     const userData = userModule.signIn(email, password);
 
     if(!userData) {
-        if(isDebug){
-            await delay(delayTime);
-        }
-
         performFailureResponse(res, INVALID_CREDENTIALS);
         return;
     }
 
     const token = tokenManager.getAccessToken(userData.id);
 
-    if(isDebug){
-        await delay(delayTime);
-    }
     performSuccessResponse(res, userData.toJson(), token);
 });
 
@@ -56,7 +50,10 @@ router.get('/:id', authMiddleware, (req, res) => {
    const { userId } = (req as any).user;
    const token = tokenManager.getAccessToken(userId);
 
-   const user = userModule.getUserById(resourceId);
+   const user = userModule.getUserById(resourceId).toJson() as any;
+   const groups = groupModule.getGroups(resourceId);
+
+   user.groups = groups;
 
    performSuccessResponse(res, user, token);
 });
@@ -75,12 +72,12 @@ router.post('/', authMiddleware, (req, res) => {
    const organization = organizationModule.getOrganizationByUserId(userId);
 
    const data = userModule.createUser(organization.id, name, lastname, email, password, groupsIdList, permissions);
-
-
+   
    if(typeof data === "string"){
        performFailureResponse(res, data);
-   }else{
-       organizationModule.addUser(organization.id, data);
+    }else{
+        organizationModule.addUser(organization.id, data);
+        groupModule.addUserToGroups(data.id, groupsIdList);
        performSuccessResponse(res, data.id, token);
    }
 });
@@ -114,6 +111,7 @@ router.put('/:id', authMiddleware, (req, res) => {
    }
 
    userModule.updateUser(resourceId, name, lastname, email, groupsIdList, permissions);
+   groupModule.updateUserGroups(resourceId, groupsIdList ?? []);
    performSuccessResponse(res, resourceId, token);
 });
 
@@ -126,6 +124,7 @@ router.delete('/:id', authMiddleware, (req, res) => {
    const organization = organizationModule.getOrganizationByUserId(resourceId);
 
    userModule.deleteUser(resourceId);
+   groupModule.deleteUserFromGroups(resourceId);
    organizationModule.deleteUser(organization.id, resourceId);
 
    performSuccessResponse(res, resourceId, token);

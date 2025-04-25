@@ -46,6 +46,8 @@ export class GroupModule{
 
         jsonData.push(newGroup.toJson());
 
+        this.userModule.addGroupToUsers(newId, usersIdList);
+
         this.file.saveJsonAsFile(jsonData);
 
         return newId;
@@ -67,11 +69,12 @@ export class GroupModule{
         return group;
     }
 
-    updateGroup(groupId: number, name: String, usersIdList: number[]) {
+    updateGroup(groupId: number, name: string, usersIdList: number[]) {
         const jsonData = this.file.getFileAsJson();
 
         const group = jsonData.find((item: any) => item.id == groupId);
-        group.name = name;
+
+        group.title = name;
         group.usersIdList = usersIdList;
 
         this.file.saveJsonAsFile(jsonData);
@@ -89,5 +92,44 @@ export class GroupModule{
         const group = jsonData.find((item: any) => item.id === id);
 
         return group.name;
+    }
+
+    addUserToGroups(userId: number, groupsIdList: number[]){
+        const jsonData = this.file.getFileAsJson();
+
+        groupsIdList.forEach((groupId) => {
+            const group = jsonData.find((item: any) => item.id === groupId);
+            group.usersIdList.push(userId);
+        });
+
+        this.file.saveJsonAsFile(jsonData);
+    }
+
+    deleteUserFromGroups(userId: number){
+        const jsonData = this.file.getFileAsJson();
+
+        jsonData.forEach((group: any) => {
+            group.usersIdList = group.usersIdList.filter((id: any) => id !== userId);
+        });
+
+        this.file.saveJsonAsFile(jsonData);
+    }
+
+    updateUserGroups(userId: number, groupsIdList: number[]){
+        const jsonData = this.file.getFileAsJson();
+
+        jsonData.forEach((group: any) => {
+            if(groupsIdList.includes(group.id)){
+                if(!group.usersIdList.includes(userId)){
+                    group.usersIdList.push(userId);
+                }
+            }else{
+                if(group.usersIdList.includes(userId)){
+                    group.usersIdList = group.usersIdList.filter((item: any) => item != userId);
+                }
+            }
+        });
+
+        this.file.saveJsonAsFile(jsonData);
     }
 }
