@@ -3,7 +3,6 @@ import UserModule from "../modules/user-module";
 import {INVALID_CREDENTIALS, INVALID_REQUEST_PARAMETERS} from "../helpers/response-codes";
 import {performFailureResponse, performSuccessResponse} from "../helpers/responses";
 import {TokenManager} from "../managers/token-manager";
-import {delay} from "../helpers/delay";
 import {authMiddleware} from "../authorization/api_authorization";
 import OrganizationModule from "../modules/organization-module";
 import { GroupModule } from "../modules/group-module";
@@ -17,7 +16,7 @@ const isDebug = process.env.DEBUG;
 const delayTime = (process.env.DELAY || 300) as number;
 const organizationModule = new OrganizationModule();
 
-router.post('/sign-in', async (req, res) => {
+router.post('/sign-in', (req, res) => {
     const { email, password } = req.body;
 
     if(!email || !password) {
@@ -28,19 +27,12 @@ router.post('/sign-in', async (req, res) => {
     const userData = userModule.signIn(email, password);
 
     if(!userData) {
-        if(isDebug){
-            await delay(delayTime);
-        }
-
         performFailureResponse(res, INVALID_CREDENTIALS);
         return;
     }
 
     const token = tokenManager.getAccessToken(userData.id);
 
-    if(isDebug){
-        await delay(delayTime);
-    }
     performSuccessResponse(res, userData.toJson(), token);
 });
 
@@ -80,8 +72,6 @@ router.post('/', authMiddleware, (req, res) => {
    const organization = organizationModule.getOrganizationByUserId(userId);
 
    const data = userModule.createUser(organization.id, name, lastname, email, password, groupsIdList, permissions);
-
-   
    
    if(typeof data === "string"){
        performFailureResponse(res, data);
