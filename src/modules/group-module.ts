@@ -69,11 +69,12 @@ export class GroupModule{
         return group;
     }
 
-    updateGroup(groupId: number, name: String, usersIdList: number[]) {
+    updateGroup(groupId: number, name: string, usersIdList: number[]) {
         const jsonData = this.file.getFileAsJson();
 
         const group = jsonData.find((item: any) => item.id == groupId);
-        group.name = name;
+
+        group.title = name;
         group.usersIdList = usersIdList;
 
         this.file.saveJsonAsFile(jsonData);
