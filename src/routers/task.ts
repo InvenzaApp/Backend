@@ -54,9 +54,6 @@ router.get('/', authMiddleware, (req, res) => {
     const { userId } = (req as any).user;
     const token = tokenManager.getAccessToken(userId);
 
-    const organization = organizationModule.getOrganizationByUserId(userId);
-    const organizationAdmin = organizationModule.getOrganizationAdmin(organization.id);
-
     const tasks = taskModule.getTasks(userId);
 
     performSuccessResponse(res, tasks, token);
