@@ -56,14 +56,8 @@ router.get('/', authMiddleware, (req, res) => {
 
     const organization = organizationModule.getOrganizationByUserId(userId);
     const organizationAdmin = organizationModule.getOrganizationAdmin(organization.id);
-    const isUserAdmin = organizationAdmin.id == userId;
 
-    let tasks;
-    if(isUserAdmin){
-        tasks = taskModule.getTasks(userId);
-    }else{
-        tasks = taskModule.getTasks(userId);
-    }
+    const tasks = taskModule.getTasks(userId);
 
     performSuccessResponse(res, tasks, token);
 });
