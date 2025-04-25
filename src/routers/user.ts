@@ -58,7 +58,10 @@ router.get('/:id', authMiddleware, (req, res) => {
    const { userId } = (req as any).user;
    const token = tokenManager.getAccessToken(userId);
 
-   const user = userModule.getUserById(resourceId);
+   const user = userModule.getUserById(resourceId).toJson() as any;
+   const groups = groupModule.getGroups(resourceId);
+
+   user.groups = groups;
 
    performSuccessResponse(res, user, token);
 });
