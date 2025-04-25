@@ -4,6 +4,7 @@ import {User} from "../models/user";
 import {adminFaker, moderatorFaker, pmFaker, taskPreviewFaker, workerFaker} from "../fakers/user";
 import {USER_EXISTS} from "../helpers/response-codes";
 import IdGetter from "../helpers/id-getter";
+import { GroupModule } from "./group-module";
 
 require("dotenv").config();
 
@@ -136,6 +137,35 @@ class UserModule {
 
         this.file.saveJsonAsFile(jsonData);
         return true;
+    }
+
+    addGroupToUsers(groupId: number, usersIdList: number[]){
+        const jsonData = this.file.getFileAsJson();
+
+        usersIdList.forEach((userId) => {
+            const user = jsonData.find((item: any) => item.id === userId);
+            user.groupsIdList.push(groupId);
+        });
+
+        this.file.saveJsonAsFile(jsonData);
+    }
+
+    updateUserGroups(usersIdList: number[], groupId: number){
+        const jsonData = this.file.getFileAsJson();
+
+        jsonData.forEach((user: any) => {
+            if(usersIdList.includes(user.id)){
+                if(!user.groupsIdList.includes(groupId)){
+                    user.groupsIdList.push(groupId);
+                }
+            }else{
+                if(user.groupsIdList.includes(groupId)){
+                    user.groupsIdList = user.groupsIdList.filter((item: any) => item != groupId);
+                }
+            }
+        });
+
+        this.file.saveJsonAsFile(jsonData);
     }
 }
 

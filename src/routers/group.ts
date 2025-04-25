@@ -6,12 +6,14 @@ import {authMiddleware} from "../authorization/api_authorization";
 import {TokenManager} from "../managers/token-manager";
 import {TaskModule} from "../modules/task-module";
 import {delay} from "../helpers/delay";
+import UserModule from "../modules/user-module";
 require("dotenv").config();
 
 const router = Router();
 const groupModule = new GroupModule();
 const tokenManager = new TokenManager()
 const taskModule = new TaskModule();
+const userModule = new UserModule();
 const isDebug = process.env.DEBUG;
 const delayTime = (process.env.DELAY || 300) as number;
 
@@ -74,6 +76,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
     const groupId = Number(req.params.id);
 
     groupModule.updateGroup(groupId, name, usersIdList);
+    userModule.updateUserGroups(usersIdList, groupId);
 
     if(isDebug){
         await delay(delayTime);

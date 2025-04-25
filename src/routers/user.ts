@@ -6,10 +6,12 @@ import {TokenManager} from "../managers/token-manager";
 import {delay} from "../helpers/delay";
 import {authMiddleware} from "../authorization/api_authorization";
 import OrganizationModule from "../modules/organization-module";
+import { GroupModule } from "../modules/group-module";
 require("dotenv").config();
 
 const router = Router();
 const tokenManager = new TokenManager();
+const groupModule = new GroupModule();
 const userModule = new UserModule();
 const isDebug = process.env.DEBUG;
 const delayTime = (process.env.DELAY || 300) as number;
@@ -76,11 +78,13 @@ router.post('/', authMiddleware, (req, res) => {
 
    const data = userModule.createUser(organization.id, name, lastname, email, password, groupsIdList, permissions);
 
-
+   
+   
    if(typeof data === "string"){
        performFailureResponse(res, data);
-   }else{
-       organizationModule.addUser(organization.id, data);
+    }else{
+        organizationModule.addUser(organization.id, data);
+        groupModule.addUserToGroups(data.id, groupsIdList);
        performSuccessResponse(res, data.id, token);
    }
 });
@@ -114,6 +118,7 @@ router.put('/:id', authMiddleware, (req, res) => {
    }
 
    userModule.updateUser(resourceId, name, lastname, email, groupsIdList, permissions);
+   groupModule.updateUserGroups(resourceId, groupsIdList ?? []);
    performSuccessResponse(res, resourceId, token);
 });
 
@@ -126,6 +131,7 @@ router.delete('/:id', authMiddleware, (req, res) => {
    const organization = organizationModule.getOrganizationByUserId(resourceId);
 
    userModule.deleteUser(resourceId);
+   groupModule.deleteUserFromGroups(resourceId);
    organizationModule.deleteUser(organization.id, resourceId);
 
    performSuccessResponse(res, resourceId, token);
