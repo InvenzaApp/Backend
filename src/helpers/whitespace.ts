@@ -1,0 +1,1 @@
+export const isOnlyWhitespace = (str: string) => str.trim() === '';

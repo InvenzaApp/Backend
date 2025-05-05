@@ -8,6 +8,7 @@ import {User} from "../models/user";
 import {DateTime} from "../helpers/date-time";
 import OrganizationModule from "./organization-module";
 import UserModule from "./user-module";
+import { isOnlyWhitespace } from "../helpers/whitespace";
 
 export class TaskModule {
     file = new FileManager("database", "tasks");
@@ -40,6 +41,10 @@ export class TaskModule {
 
         const newTask = new Task(newId, title, description, deadline, groupsIdList, DateTime.getFullTimestamp(), createdBy, "toDo");
 
+        if(description == null || isOnlyWhitespace(description)){
+            newTask.description = null;
+        }
+
         jsonData.push(newTask.toJson());
 
         this.file.saveJsonAsFile(jsonData);
@@ -59,6 +64,10 @@ export class TaskModule {
         task.deadline = deadline; 
         task.groupsIdList = groupsIdList;
         task.status = status;
+
+        if(isOnlyWhitespace(description ?? '')){
+            task.description = null;
+        }
 
         this.file.saveJsonAsFile(jsonData);
 
