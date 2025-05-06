@@ -1,61 +1,17 @@
 export const adminPermissions = [
-  "addUser",
-  "listUser",
-  "showUser",
-  "updateUser",
-  "deleteUser",
-  "addGroup",
-  "listGroup",
-  "showGroup",
-  "updateGroup",
-  "deleteGroup",
-  "addTask",
-  "listTask",
-  "showTask",
-  "updateTask",
-  "deleteTask",
-];
-
-export const moderatorPermissions = [
-  "addUser",
-  "listUser",
-  "showUser",
-  "updateUser",
-  "deleteUser",
-  "addGroup",
-  "listGroup",
-  "showGroup",
-  "updateGroup",
-  "deleteGroup",
-  "addTask",
-  "listTask",
-  "showTask",
-  "updateTask",
-  "deleteTask",
-];
-
-export const PMPermissions = [
-  "listUser",
-  "showUser",
-  "listGroup",
-  "showGroup",
-  "addTask",
-  "listTask",
-  "showTask",
-  "updateTask",
-  "deleteTask",
-];
-
-export const WorkerPermissions = [
-  "listUser",
-  "showUser",
-  "listGroup",
-  "showGroup",
-  "listTask",
-  "showTask",
-];
-
-export const PreviewTaskPermissions = [
-  "listTask",
-  "showTask",
+  "add_user",
+  "list_user",
+  "show_user",
+  "update_user",
+  "delete_user",
+  "add_group",
+  "list_group",
+  "show_group",
+  "update_group",
+  "delete_group",
+  "add_task",
+  "list_task",
+  "show_task",
+  "update_task",
+  "delete_task",
 ];

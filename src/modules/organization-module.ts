@@ -1,6 +1,7 @@
+import { defaultOrganization } from "../fakers/organization";
 import FileManager from "../managers/file-manager";
 import {Organization} from "../models/organization";
-import {defaultOrganization, organizationFaker} from "../fakers/organization";
+
 import {User} from "../models/user";
 import UserModule from "./user-module";
 
@@ -8,20 +9,16 @@ class OrganizationModule {
     file = new FileManager("database", "organization");
     userModule = new UserModule();
 
-    constructor(createDefaultCompany: boolean = false) {
+    constructor() {
         this.file.initializeFile();
 
         if(this.file.isEmpty()){
-            this.initializeFile(createDefaultCompany);
+            this.initializeFile();
         }
     }
 
-    private initializeFile(createDefaultCompany: boolean = false){
-        if(createDefaultCompany){
-            this.file.saveJsonAsFile([organizationFaker]);
-        }else{
-            this.file.saveJsonAsFile([defaultOrganization]);
-        }
+    private initializeFile(){
+        this.file.saveJsonAsFile([defaultOrganization]);
     }
 
     getOrganizationById(organizationId: number): Organization{

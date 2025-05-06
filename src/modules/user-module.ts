@@ -1,7 +1,7 @@
 import FileManager from "../managers/file-manager";
 import hashPassword from "../helpers/hash-password";
 import {User} from "../models/user";
-import {adminFaker, moderatorFaker, pmFaker, taskPreviewFaker, workerFaker} from "../fakers/user";
+import {adminFaker} from "../fakers/user";
 import {USER_EXISTS} from "../helpers/response-codes";
 import IdGetter from "../helpers/id-getter";
 import { GroupModule } from "./group-module";
@@ -11,7 +11,7 @@ require("dotenv").config();
 class UserModule {
     file = new FileManager("database", "users");
 
-    constructor(createDefaultUser: boolean = false) {
+    constructor() {
         this.file.initializeFile();
 
         if (this.file.isEmpty()) {
@@ -19,18 +19,10 @@ class UserModule {
         }
     }
 
-    private initializeFile(createDefaultUser: boolean = false) {
-        if(createDefaultUser){
-            this.file.saveJsonAsFile([
-                adminFaker.toJson(),
-                moderatorFaker.toJson(),
-                pmFaker.toJson(),
-                workerFaker.toJson(),
-                taskPreviewFaker.toJson(),
-            ]);
-        }else{
-            this.file.saveJsonAsFile([adminFaker.toJson()]);
-        }
+    private initializeFile() {
+        this.file.saveJsonAsFile([
+            adminFaker.toJson(),
+        ]);
     }
 
     signIn(email: string, password: string): User | null {
