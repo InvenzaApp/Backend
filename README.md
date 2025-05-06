@@ -15,6 +15,11 @@ Before starting server, you have to create folder `cert` inside `src` folder. In
 * `cert.pem`
 * `key.pem`
 
+## Firebase
+
+To initialize Firebase, you have to replace all `FIREBASE_*` variables with proper values.
+Also, put your `fcmServiceAccountKey.json` file in root directory.
+
 ## Getting Started
 
 To initialize project just run this command in terminal:

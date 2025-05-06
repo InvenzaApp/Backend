@@ -3,6 +3,7 @@ import userRouter from './routers/user';
 import tasksRouter from './routers/task';
 import organizationRouter from './routers/organization';
 import groupsRouter from './routers/group';
+import tokenRouter from './routers/token';
 import permissionRouter from './routers/permission';
 import UserModule from './modules/user-module';
 import OrganizationModule from "./modules/organization-module";
@@ -11,6 +12,7 @@ import {GroupModule} from "./modules/group-module";
 import fs from "fs";
 import * as https from "node:https";
 import path from "path";
+import { NotificationsManager } from './managers/notifications-manager';
 
 require('dotenv').config();
 
@@ -25,10 +27,7 @@ app.use('/api/tasks', tasksRouter);
 app.use('/api/organization', organizationRouter);
 app.use('/api/groups', groupsRouter);
 app.use('/api/permissions', permissionRouter);
-
-app.get('/', (req, res) => {
-   res.send('Hello, world!');
-})
+app.use('/api/token', tokenRouter);
 
 const initialize = () => {
    const isDebug = process.env.DEBUG == "true";
