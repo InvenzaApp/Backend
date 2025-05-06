@@ -74,6 +74,44 @@ export class TaskModule {
         return id;
     }
 
+    getDeletedGroupsIdListOnUpdate(newGroupsIdList: number[], taskId: number): number[]{
+        const jsonData = this.file.getFileAsJson();
+
+        const foundTask = jsonData.find((task: any) => task.id === taskId);
+
+        if(!foundTask) return [];
+
+        const groupsIdList = foundTask.groupsIdList;
+        var tmpList: number[] = [];
+
+        groupsIdList.forEach((groupId: number) => {
+            if(!newGroupsIdList.includes(groupId)){
+                tmpList.push(groupId);
+            }
+        });
+
+        return tmpList;
+    }
+
+    getAddedGroupsIdListOnUpdate(newGroupsIdList: number[], taskId: number): number[]{
+        const jsonData = this.file.getFileAsJson();
+
+        const foundTask = jsonData.find((task: any) => task.id === taskId);
+
+        if(!foundTask) return [];
+
+        const groupsIdList = foundTask.groupsIdList;
+        var tmpList: number[] = [];
+
+        newGroupsIdList.forEach((groupId: number) => {
+            if(!groupsIdList.includes(groupId)){
+                tmpList.push(groupId);
+            }
+        });
+
+        return tmpList;
+    }
+
     getTasks(userId: number): Task[] {
         const jsonData = this.file.getFileAsJson();
         const groups = this.groupModule.getGroups(userId);

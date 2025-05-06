@@ -6,6 +6,7 @@ import {authMiddleware} from "../authorization/api_authorization";
 import {TokenManager} from "../managers/token-manager";
 import UserModule from "../modules/user-module";
 import OrganizationModule from "../modules/organization-module";
+import { NotificationsManager } from "../managers/notifications-manager";
 
 require("dotenv").config();
 
@@ -13,9 +14,7 @@ const router = Router();
 const taskModule = new TaskModule();
 const tokenManager = new TokenManager();
 const userModule = new UserModule();
-const organizationModule = new OrganizationModule();
-const isDebug = process.env.DEBUG;
-const delayTime = (process.env.DELAY || 300) as number;
+const notifications = new NotificationsManager();
 
 router.post('/', authMiddleware, (req, res) => {
     const { title, description, deadline, groupsIdList } = req.body;
@@ -31,6 +30,8 @@ router.post('/', authMiddleware, (req, res) => {
 
     const taskId = taskModule.addTask(title, description, deadline, groupsIdList, user);
 
+    notifications.sendNotificationToGroups(groupsIdList, `Dodano zadanie ${title}`);
+
     performSuccessResponse(res, taskId, token);
 });
 
@@ -45,7 +46,16 @@ router.put('/:id', authMiddleware, (req, res) => {
         return;
     }
 
+    const task = taskModule.getTask(id);
+
+    const deletedGroups = taskModule.getDeletedGroupsIdListOnUpdate(groupsIdList, id);
+    const addedGroups = taskModule.getAddedGroupsIdListOnUpdate(groupsIdList, id);
+    notifications.sendNotificationToGroups(deletedGroups, `Usunięto zadanie ${task.title}`);
+    notifications.sendNotificationToGroups(addedGroups, `Dodano zadanie ${task.title}`);
+
     const taskId = taskModule.updateTask(id, title, description, deadline, groupsIdList, status);
+
+    notifications.sendNotificationToGroups(groupsIdList, `Zaktualizowano zadanie ${task.title}`);
 
     performSuccessResponse(res, taskId, token);
 });
@@ -74,6 +84,8 @@ router.delete('/:id', authMiddleware, (req, res) => {
     const { userId } = (req as any).user;
     const token = tokenManager.getAccessToken(userId);
 
+    const task = taskModule.getTask(resourceId);
+    notifications.sendNotificationToGroups(task.groupsIdList, `Usunięto zadanie ${task.title}`);
     taskModule.deleteTask(resourceId);
 
     performSuccessResponse(res, resourceId, token);
