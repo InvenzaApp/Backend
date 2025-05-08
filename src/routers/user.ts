@@ -6,18 +6,19 @@ import {TokenManager} from "../managers/token-manager";
 import {authMiddleware} from "../authorization/api_authorization";
 import OrganizationModule from "../modules/organization-module";
 import { GroupModule } from "../modules/group-module";
+import { SettingsModule } from "../modules/settings-module";
 require("dotenv").config();
 
 const router = Router();
 const tokenManager = new TokenManager();
 const groupModule = new GroupModule();
 const userModule = new UserModule();
-const isDebug = process.env.DEBUG;
-const delayTime = (process.env.DELAY || 300) as number;
 const organizationModule = new OrganizationModule();
+const settingsModule = new SettingsModule();
 
 router.post('/sign-in', (req, res) => {
     const { email, password } = req.body;
+    const locale = req.get('locale');
 
     if(!email || !password) {
         performFailureResponse(res, INVALID_REQUEST_PARAMETERS);
@@ -32,6 +33,7 @@ router.post('/sign-in', (req, res) => {
     }
 
     const token = tokenManager.getAccessToken(userData.id);
+    settingsModule.changeLanguage(userData.id, locale);
 
     performSuccessResponse(res, userData.toJson(), token);
 });
@@ -123,6 +125,7 @@ router.delete('/:id', authMiddleware, (req, res) => {
 
    const organization = organizationModule.getOrganizationByUserId(resourceId);
 
+   settingsModule.removeLanguage(resourceId);
    userModule.deleteUser(resourceId);
    groupModule.deleteUserFromGroups(resourceId);
    organizationModule.deleteUser(organization.id, resourceId);
