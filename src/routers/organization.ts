@@ -8,8 +8,6 @@ require("dotenv").config();
 const router = Router();
 const organizationModule = new OrganizationModule();
 const tokenManager = new TokenManager();
-const isDebug = process.env.DEBUG;
-const delayTime = (process.env.DELAY || 300) as number;
 
 router.get('/:organizationId', authMiddleware, (req, res) => {
     const organizationId = Number(req.params.organizationId);

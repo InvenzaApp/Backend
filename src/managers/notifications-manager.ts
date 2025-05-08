@@ -1,10 +1,12 @@
 import FileManager from '../managers/file-manager';
 import messaging from '../managers/firebase-manager';
+import { LocaleManager } from './locale-manager';
 require('dotenv').config();
 
 export class NotificationsManager{
     file = new FileManager("database", "tokens");
     groupsFile = new FileManager("database", "groups");
+    localeManager = new LocaleManager();
 
     constructor(){
         this.file.initializeFile();
@@ -27,17 +29,17 @@ export class NotificationsManager{
         this.file.saveJsonAsFile(jsonData);
     }
 
-    sendNotificationToUser(userId: number, message: string){
+    sendNotificationToUser(userId: number, messageCode: string){
         const jsonData = this.file.getFileAsJson();
 
         const foundUser = jsonData.find((user: any) => user.userId === userId);
 
         if(!foundUser) return;
 
-        this.sendNotification(message, foundUser.token);
+        this.sendNotification(userId, messageCode, foundUser.token);
     }
 
-    sendNotificationToUsers(userIdList: number[], message: string){
+    sendNotificationToUsers(userIdList: number[], messageCode: string){
         const jsonData = this.file.getFileAsJson();
 
         userIdList.forEach((userId: number) => {
@@ -45,11 +47,11 @@ export class NotificationsManager{
             
             if(!foundUser) return;
 
-            this.sendNotification(message, foundUser.token);
+            this.sendNotification(userId, messageCode, foundUser.token);
         });
     }
 
-    sendNotificationToGroup(groupId: number, message: string){
+    sendNotificationToGroup(groupId: number, messageCode: string){
         const jsonData = this.file.getFileAsJson();
         const jsonGroupsData = this.groupsFile.getFileAsJson();
 
@@ -64,7 +66,7 @@ export class NotificationsManager{
 
             if(!foundUser) return;
 
-            this.sendNotification(message, foundUser.token);
+            this.sendNotification(userId, messageCode, foundUser.token);
         });
     }
 
@@ -74,18 +76,21 @@ export class NotificationsManager{
         })
     }
 
-    private sendNotification(message: string, token: string){
+    private sendNotification(userId: number, messageCode: string, token: string){
+        const title = this.localeManager.getMessage(userId, "notification");
+        const message = this.localeManager.getMessage(userId, messageCode);
+
         const payload = {
             notification: {
-                title: "Powiadomienie",
-                body: message
+                title: title,
+                body: message,
             },
             apns: {
                 payload: {
                   aps: {
                     alert: {
-                      title: "Powiadomienie",
-                      body: message
+                      title: title,
+                      body: message,
                     },
                     sound: "default"
                   }

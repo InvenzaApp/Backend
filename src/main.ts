@@ -13,6 +13,7 @@ import fs from "fs";
 import * as https from "node:https";
 import * as http from "node:http";
 import path from "path";
+import { SettingsModule } from './modules/settings-module';
 
 require('dotenv').config();
 
@@ -31,6 +32,7 @@ app.use('/api/permissions', permissionRouter);
 app.use('/api/token', tokenRouter);
 
 const initialize = () => {
+   new SettingsModule();
    new UserModule();
    new OrganizationModule();
    new TaskModule();
