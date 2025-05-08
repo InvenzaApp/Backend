@@ -4,3 +4,4 @@
 .env
 src/database
 src/cert/
+fcmServiceAccountKey.json

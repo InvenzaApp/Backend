@@ -6,6 +6,8 @@ import {authMiddleware} from "../authorization/api_authorization";
 import {TokenManager} from "../managers/token-manager";
 import {TaskModule} from "../modules/task-module";
 import UserModule from "../modules/user-module";
+import { NotificationsManager } from "../managers/notifications-manager";
+import { LocaleManager } from "../managers/locale-manager";
 require("dotenv").config();
 
 const router = Router();
@@ -13,8 +15,8 @@ const groupModule = new GroupModule();
 const tokenManager = new TokenManager()
 const taskModule = new TaskModule();
 const userModule = new UserModule();
-const isDebug = process.env.DEBUG;
-const delayTime = (process.env.DELAY || 300) as number;
+const notifications = new NotificationsManager();
+const localeManager = new LocaleManager();
 
 router.get('/', authMiddleware, (req, res) => {
     const { userId } = (req as any).user;
@@ -47,6 +49,8 @@ router.post('/', authMiddleware, (req, res) => {
 
    const groupId = groupModule.addGroup(name, usersIdList);
 
+   notifications.sendNotificationToUsers(usersIdList, "group_created");
+
    performSuccessResponse(res, groupId, token);
 });
 
@@ -62,8 +66,17 @@ router.put('/:id', authMiddleware, (req, res) => {
 
     const groupId = Number(req.params.id);
 
+    const deletedUsers = groupModule.getRemovedUsersIdListOnUpdate(usersIdList, groupId);
+    const addedUsers = groupModule.getAddedUsersIdListOnUpdate(usersIdList, groupId);
+    notifications.sendNotificationToUsers(deletedUsers, "group_removed");
+    notifications.sendNotificationToUsers(addedUsers, "group_added");
+
     groupModule.updateGroup(groupId, name, usersIdList);
     userModule.updateUserGroups(usersIdList, groupId);
+
+    const notifyUsersIdList = usersIdList.filter((userId: number) => !addedUsers.includes(userId));
+
+    notifications.sendNotificationToUsers(notifyUsersIdList, "group_updated");
 
     performSuccessResponse(res, groupId, token);
 })
@@ -72,6 +85,8 @@ router.delete('/:id', authMiddleware, (req, res) => {
     const { userId } = (req as any).user;
     const token = tokenManager.getAccessToken(userId);
     const groupId = Number(req.params.id);
+
+    notifications.sendNotificationToGroup(groupId, "group_deleted");
 
     groupModule.deleteGroup(groupId);
     taskModule.removeGroupFromTasks(groupId);

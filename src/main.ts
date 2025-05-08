@@ -3,6 +3,7 @@ import userRouter from './routers/user';
 import tasksRouter from './routers/task';
 import organizationRouter from './routers/organization';
 import groupsRouter from './routers/group';
+import tokenRouter from './routers/token';
 import permissionRouter from './routers/permission';
 import UserModule from './modules/user-module';
 import OrganizationModule from "./modules/organization-module";
@@ -10,12 +11,15 @@ import {TaskModule} from "./modules/task-module";
 import {GroupModule} from "./modules/group-module";
 import fs from "fs";
 import * as https from "node:https";
+import * as http from "node:http";
 import path from "path";
+import { SettingsModule } from './modules/settings-module';
 
 require('dotenv').config();
 
 const app = express();
 const port = process.env.SERVER_PORT || 3000;
+const isDebug = process.env.DEBUG == "true";
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -25,27 +29,30 @@ app.use('/api/tasks', tasksRouter);
 app.use('/api/organization', organizationRouter);
 app.use('/api/groups', groupsRouter);
 app.use('/api/permissions', permissionRouter);
-
-app.get('/', (req, res) => {
-   res.send('Hello, world!');
-})
+app.use('/api/token', tokenRouter);
 
 const initialize = () => {
-   const isDebug = process.env.DEBUG == "true";
-
-   new UserModule(isDebug);
-   new OrganizationModule(isDebug);
-   new TaskModule(isDebug);
-   new GroupModule(isDebug);
+   new SettingsModule();
+   new UserModule();
+   new OrganizationModule();
+   new TaskModule();
+   new GroupModule();
 }
 
-const sslOptions = {
-   key: fs.readFileSync(path.join(__dirname, './cert/key.pem')),
-   cert: fs.readFileSync(path.join(__dirname, './cert/cert.pem')),
-   ca: fs.readFileSync(path.join(__dirname, './cert/ca.pem')),
+if(isDebug){
+   http.createServer(app).listen(port, () => {
+      initialize();
+      console.log(`Server started on port ${port}`);
+   });
+}else{
+   const sslOptions = {
+      key: fs.readFileSync(path.join(__dirname, './cert/key.pem')),
+      cert: fs.readFileSync(path.join(__dirname, './cert/cert.pem')),
+      ca: fs.readFileSync(path.join(__dirname, './cert/ca.pem')),
+   }
+   
+   https.createServer(sslOptions, app).listen(port, () => {
+      initialize();
+      console.log(`Server started on port ${port}`);
+   });
 }
-
-https.createServer(sslOptions, app).listen(port, () => {
-   initialize();
-   console.log(`Server started on port ${port}`);
-});

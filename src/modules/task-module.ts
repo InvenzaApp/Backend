@@ -3,11 +3,11 @@ import {Task} from "../models/task";
 import IdGetter from "../helpers/id-getter";
 import {GroupModule} from "./group-module";
 import {Group} from "../models/group";
-import {taskFaker1, taskFaker2, taskFaker3, taskFaker4, taskFaker5, taskFaker6} from "../fakers/task";
 import {User} from "../models/user";
 import {DateTime} from "../helpers/date-time";
 import OrganizationModule from "./organization-module";
 import UserModule from "./user-module";
+import { isOnlyWhitespace } from "../helpers/whitespace";
 
 export class TaskModule {
     file = new FileManager("database", "tasks");
@@ -15,23 +15,8 @@ export class TaskModule {
     organizationModule = new OrganizationModule();
     userModule = new UserModule();
 
-    constructor(createDefaultTasks: boolean = false) {
+    constructor() {
         this.file.initializeFile();
-
-        if (createDefaultTasks && this.file.isEmpty()) {
-            this.initializeFile();
-        }
-    }
-
-    private initializeFile() {
-        this.file.saveJsonAsFile([
-            taskFaker1,
-            taskFaker2,
-            taskFaker3,
-            taskFaker4,
-            taskFaker5,
-            taskFaker6,
-        ]);
     }
 
     addTask(title: string, description: string | null, deadline: string | null, groupsIdList: number[], createdBy: User): number {
@@ -39,6 +24,10 @@ export class TaskModule {
         const newId = IdGetter(jsonData);
 
         const newTask = new Task(newId, title, description, deadline, groupsIdList, DateTime.getFullTimestamp(), createdBy, "toDo");
+
+        if(description == null || isOnlyWhitespace(description)){
+            newTask.description = null;
+        }
 
         jsonData.push(newTask.toJson());
 
@@ -60,9 +49,51 @@ export class TaskModule {
         task.groupsIdList = groupsIdList;
         task.status = status;
 
+        if(isOnlyWhitespace(description ?? '')){
+            task.description = null;
+        }
+
         this.file.saveJsonAsFile(jsonData);
 
         return id;
+    }
+
+    getDeletedGroupsIdListOnUpdate(newGroupsIdList: number[], taskId: number): number[]{
+        const jsonData = this.file.getFileAsJson();
+
+        const foundTask = jsonData.find((task: any) => task.id === taskId);
+
+        if(!foundTask) return [];
+
+        const groupsIdList = foundTask.groupsIdList;
+        var tmpList: number[] = [];
+
+        groupsIdList.forEach((groupId: number) => {
+            if(!newGroupsIdList.includes(groupId)){
+                tmpList.push(groupId);
+            }
+        });
+
+        return tmpList;
+    }
+
+    getAddedGroupsIdListOnUpdate(newGroupsIdList: number[], taskId: number): number[]{
+        const jsonData = this.file.getFileAsJson();
+
+        const foundTask = jsonData.find((task: any) => task.id === taskId);
+
+        if(!foundTask) return [];
+
+        const groupsIdList = foundTask.groupsIdList;
+        var tmpList: number[] = [];
+
+        newGroupsIdList.forEach((groupId: number) => {
+            if(!groupsIdList.includes(groupId)){
+                tmpList.push(groupId);
+            }
+        });
+
+        return tmpList;
     }
 
     getTasks(userId: number): Task[] {

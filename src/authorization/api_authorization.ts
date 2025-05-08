@@ -2,11 +2,14 @@ import {NextFunction, Request as ExpressRequest, Response as ExpressResponse} fr
 import {performFailureResponse} from "../helpers/responses";
 import {UNAUTHORIZED_ACCESS} from "../helpers/response-codes";
 import jwt from "jsonwebtoken";
+import { SettingsModule } from "../modules/settings-module";
 
 require('dotenv').config();
+const settings = new SettingsModule();
 
 export const authMiddleware = (req: ExpressRequest, res: ExpressResponse, next: NextFunction) => {
     const headers = req.headers['authorization'];
+    const locale = req.get('locale');
     const token = headers?.split(' ')[1];
     const secretKey = process.env.API_TOKEN as string;
 
@@ -17,6 +20,9 @@ export const authMiddleware = (req: ExpressRequest, res: ExpressResponse, next: 
 
     try{
         (req as any).user = jwt.verify(token, secretKey);
+
+        const userId = (req as any).user.userId;
+        settings.changeLanguage(userId, locale);
         next();
     }catch(err){
         performFailureResponse(res, UNAUTHORIZED_ACCESS);

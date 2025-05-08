@@ -1,29 +1,14 @@
 import FileManager from "../managers/file-manager";
 import {Group} from "../models/group";
 import IdGetter from "../helpers/id-getter";
-import {adminGroupFaker, moderatorGroupFaker, pmGroupFaker, taskPreviewGroupFaker, workerGroupFaker} from "../fakers/group";
 import UserModule from "./user-module";
 import {User} from "../models/user";
 
 export class GroupModule{
     file = new FileManager("database", "groups");
     userModule = new UserModule();
-    constructor(generateDefaultGroup: boolean = false) {
+    constructor() {
         this.file.initializeFile();
-
-        if(generateDefaultGroup && this.file.isEmpty()) {
-            this.initializeFile();
-        }
-    }
-
-    private initializeFile(){
-        this.file.saveJsonAsFile([
-            adminGroupFaker.toJson(),
-            moderatorGroupFaker.toJson(),
-            pmGroupFaker.toJson(),
-            workerGroupFaker.toJson(),
-            taskPreviewGroupFaker.toJson(),
-        ]);
     }
 
     getGroups(userId: number): Group[]{
@@ -80,6 +65,46 @@ export class GroupModule{
         this.file.saveJsonAsFile(jsonData);
     }
 
+    getRemovedUsersIdListOnUpdate(newUsersIdList: number[], groupId: number): number[] {
+        const jsonData = this.file.getFileAsJson();
+
+        const foundGroup = jsonData.find((group: any) => group.id === groupId);
+
+        if(!foundGroup) return [];
+
+        const usersIdList = foundGroup.usersIdList;
+
+        var tmpList: number[] = [];
+
+        usersIdList.forEach((userId: number) => {
+            if(!newUsersIdList.includes(userId)){
+                tmpList.push(userId);
+            }
+        });
+
+        return tmpList;
+    }
+
+    getAddedUsersIdListOnUpdate(newUsersIdList: number[], groupId: number): number[] {
+        const jsonData = this.file.getFileAsJson();
+
+        const foundGroup = jsonData.find((group: any) => group.id === groupId);
+
+        if(!foundGroup) return [];
+
+        const usersIdList = foundGroup.usersIdList;
+
+        var tmpList: number[] = [];
+
+        newUsersIdList.forEach((userId: number) => {
+            if(!usersIdList.includes(userId)){
+                tmpList.push(userId);
+            }
+        });
+
+        return tmpList;
+    }
+
     deleteGroup(groupId: number){
         const jsonData = this.file.getFileAsJson();
         const filteredData = jsonData.filter((item: any) => item.id !== groupId);
@@ -91,13 +116,13 @@ export class GroupModule{
         const jsonData = this.file.getFileAsJson();
         const group = jsonData.find((item: any) => item.id === id);
 
-        return group.name;
+        return group.title;
     }
 
     addUserToGroups(userId: number, groupsIdList: number[]){
         const jsonData = this.file.getFileAsJson();
 
-        groupsIdList.forEach((groupId) => {
+        (groupsIdList ?? []).forEach((groupId) => {
             const group = jsonData.find((item: any) => item.id === groupId);
             group.usersIdList.push(userId);
         });
