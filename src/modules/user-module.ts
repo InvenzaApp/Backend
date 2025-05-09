@@ -165,7 +165,7 @@ class UserModule {
         const foundUser = jsonData.find((user:any) => user.id === userId);
         const emailTaken = jsonData.find((user: any) => user.email === email);
 
-        if(emailTaken){
+        if(emailTaken.id !== userId){
             return false;
         }
 
