@@ -159,6 +159,26 @@ class UserModule {
 
         this.file.saveJsonAsFile(jsonData);
     }
+
+    updateSelfAccount(userId: number, name: string, lastname: string, email: string): boolean{
+        const jsonData = this.file.getFileAsJson();
+        const foundUser = jsonData.find((user:any) => user.id === userId);
+        const emailTaken = jsonData.find((user: any) => user.email === email);
+
+        if(emailTaken){
+            return false;
+        }
+
+        if(!foundUser) return false;
+
+        foundUser.name = name;
+        foundUser.lastname = lastname;
+        foundUser.title = `${name} ${lastname}`;
+        foundUser.email = email;
+
+        this.file.saveJsonAsFile(jsonData);
+        return true;
+    }
 }
 
 export default UserModule;
