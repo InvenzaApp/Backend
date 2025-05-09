@@ -1,6 +1,6 @@
 import { Router } from "express";
 import UserModule from "../modules/user-module";
-import {INVALID_CREDENTIALS, INVALID_REQUEST_PARAMETERS} from "../helpers/response-codes";
+import {INVALID_CREDENTIALS, INVALID_REQUEST_PARAMETERS, USER_EXISTS} from "../helpers/response-codes";
 import {performFailureResponse, performSuccessResponse} from "../helpers/responses";
 import {TokenManager} from "../managers/token-manager";
 import {authMiddleware} from "../authorization/api_authorization";
@@ -131,6 +131,26 @@ router.delete('/:id', authMiddleware, (req, res) => {
    organizationModule.deleteUser(organization.id, resourceId);
 
    performSuccessResponse(res, resourceId, token);
+});
+
+router.post('/update-user', authMiddleware, (req, res) => {
+    const { userId } = (req as any).user;
+    const token = tokenManager.getAccessToken(userId);
+
+    const { name, lastname, email } = req.body;
+
+    if(!name || !lastname || !email){
+        performFailureResponse(res, INVALID_REQUEST_PARAMETERS);
+        return;
+    }
+
+    const success = userModule.updateSelfAccount(userId, name, lastname, email);
+
+    if(success){
+        performSuccessResponse(res, success, token);
+    }else{
+        performFailureResponse(res, USER_EXISTS);
+    }
 });
 
 export default router;

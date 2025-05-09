@@ -1,3 +1,4 @@
+import { addressFaker } from "./address";
 import {adminFaker} from "./user";
 
 export const defaultOrganization = {
@@ -5,4 +6,5 @@ export const defaultOrganization = {
     'title': 'Invenza',
     'usersIdList': [adminFaker.id],
     'adminId': adminFaker.id,
+    'address': addressFaker
 }
