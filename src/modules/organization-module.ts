@@ -59,6 +59,26 @@ class OrganizationModule {
 
         this.file.saveJsonAsFile(jsonData);
     }
+
+    updateOrganization(organizationId: number, title: string, street: string, buildingNumber: string, apartmentNumber: string,
+        postCode: string, city: string, country: string
+    ): boolean{
+        const jsonData = this.file.getFileAsJson();
+        const organization = jsonData.find((item: any) => item.id === organizationId);
+
+        if(!organization) return false;
+
+        organization.title = title;
+        organization.address.street = street;
+        organization.address.buildingNumber = buildingNumber;
+        organization.address.apartmentNumber = apartmentNumber ?? null;
+        organization.address.postCode = postCode;
+        organization.address.city = city;
+        organization.address.country = country;
+
+        this.file.saveJsonAsFile(jsonData);
+        return true;
+    }
 }
 
 export default OrganizationModule;
