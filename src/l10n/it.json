@@ -1,0 +1,15 @@
+{
+    "notification": "Notifica",
+
+    "group_created": "È stato creato un nuovo gruppo",
+    "group_added": "Sei stato/a aggiunto/a al gruppo",
+    "group_removed": "Sei stato/a rimosso/a dal gruppo",
+    "group_updated": "Il gruppo è stato aggiornato",
+    "group_deleted": "Il gruppo è stato eliminato",
+
+    "task_created": "Nuova attività aggiunta",
+    "task_added": "Sei stato/a assegnato/a all'attività",
+    "task_removed": "Sei stato/a rimosso/a dall'attività",
+    "task_updated": "L'attività è stata aggiornata",
+    "task_deleted": "L'attività è stata eliminata"
+}

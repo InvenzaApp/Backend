@@ -1,0 +1,15 @@
+{
+    "notification": "Notificación",
+
+    "group_created": "Se ha creado un nuevo grupo",
+    "group_added": "Has sido añadido/a al grupo",
+    "group_removed": "Has sido eliminado/a del grupo",
+    "group_updated": "El grupo ha sido actualizado",
+    "group_deleted": "El grupo ha sido eliminado",
+
+    "task_created": "Nueva tarea añadida",
+    "task_added": "Has sido asignado/a a la tarea",
+    "task_removed": "Has sido eliminado/a de la tarea",
+    "task_updated": "La tarea ha sido actualizada",
+    "task_deleted": "La tarea ha sido eliminada"
+}
