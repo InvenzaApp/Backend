@@ -1,0 +1,15 @@
+{
+    "notification": "通知",
+
+    "group_created": "新しいグループが作成されました",
+    "group_added": "グループに追加されました",
+    "group_removed": "グループから削除されました",
+    "group_updated": "グループが更新されました",
+    "group_deleted": "グループが削除されました",
+
+    "task_created": "新しいタスクが追加されました",
+    "task_added": "タスクに割り当てられました",
+    "task_removed": "タスクから削除されました",
+    "task_updated": "タスクが更新されました",
+    "task_deleted": "タスクが削除されました"
+}
