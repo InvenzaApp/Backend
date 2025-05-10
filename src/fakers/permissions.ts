@@ -15,5 +15,7 @@ export const adminPermissions = [
   "update_task",
   "delete_task",
   "show_organization",
-  "update_organization"
+  "update_organization",
+  "other_account_show",
+  "other_account_update"
 ];
