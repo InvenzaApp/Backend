@@ -64,7 +64,7 @@ router.post('/', authMiddleware, (req, res) => {
    const { userId } = (req as any).user;
    const token = tokenManager.getAccessToken(userId);
 
-   const { name, lastname, email, password, groupsIdList, permissions } = req.body;
+   const { name, lastname, email, password, groupsIdList, permissions, admin, locked } = req.body;
 
    if(!name || !lastname || !email || !password) {
        performFailureResponse(res, INVALID_CREDENTIALS);
@@ -73,7 +73,7 @@ router.post('/', authMiddleware, (req, res) => {
 
    const organization = organizationModule.getOrganizationByUserId(userId);
 
-   const data = userModule.createUser(organization.id, name, lastname, email, password, groupsIdList, permissions);
+   const data = userModule.createUser(organization.id, name, lastname, email, password, groupsIdList, permissions, admin ?? false, locked ?? false);
    
    if(typeof data === "string"){
        performFailureResponse(res, data);
@@ -105,14 +105,14 @@ router.put('/:id', authMiddleware, (req, res) => {
    const { userId } = (req as any).user;
    const token = tokenManager.getAccessToken(userId);
    const resourceId = Number(req.params.id);
-   const { name, lastname, email, groupsIdList, permissions } = req.body;
+   const { name, lastname, email, groupsIdList, permissions, admin, locked } = req.body;
 
    if(!name || !lastname || !email) {
        performFailureResponse(res, INVALID_CREDENTIALS);
        return;
    }
 
-   userModule.updateUser(resourceId, name, lastname, email, groupsIdList, permissions);
+   userModule.updateUser(resourceId, name, lastname, email, groupsIdList, permissions, admin, locked);
    groupModule.updateUserGroups(resourceId, groupsIdList ?? []);
    performSuccessResponse(res, resourceId, token);
 });

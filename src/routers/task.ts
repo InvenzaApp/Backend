@@ -17,7 +17,7 @@ const userModule = new UserModule();
 const notifications = new NotificationsManager();
 
 router.post('/', authMiddleware, (req, res) => {
-    const { title, description, deadline, groupsIdList } = req.body;
+    const { title, description, deadline, groupsIdList, locked } = req.body;
     const { userId } = (req as any).user;
     const token = tokenManager.getAccessToken(userId);
 
@@ -28,7 +28,7 @@ router.post('/', authMiddleware, (req, res) => {
 
     const user = userModule.getUserById(userId);
 
-    const taskId = taskModule.addTask(title, description, deadline, groupsIdList, user);
+    const taskId = taskModule.addTask(title, description, deadline, groupsIdList, user, locked ?? false);
 
     notifications.sendNotificationToGroups(groupsIdList, "task_created");
 
@@ -37,7 +37,7 @@ router.post('/', authMiddleware, (req, res) => {
 
 router.put('/:id', authMiddleware, (req, res) => {
     const id = Number(req.params.id);
-    const { title, description, deadline, groupsIdList, status } = req.body;
+    const { title, description, deadline, groupsIdList, status, locked } = req.body;
     const { userId } = (req as any).user;
     const token = tokenManager.getAccessToken(userId);
 
@@ -51,7 +51,7 @@ router.put('/:id', authMiddleware, (req, res) => {
     notifications.sendNotificationToGroups(deletedGroups, "task_removed");
     notifications.sendNotificationToGroups(addedGroups, "task_added");
 
-    const taskId = taskModule.updateTask(id, title, description, deadline, groupsIdList, status);
+    const taskId = taskModule.updateTask(id, title, description, deadline, groupsIdList, status, locked);
 
     const notifyGroupsIdList = groupsIdList.filter((groupId: number) => !addedGroups.includes(groupId));
 

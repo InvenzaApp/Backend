@@ -19,11 +19,11 @@ export class TaskModule {
         this.file.initializeFile();
     }
 
-    addTask(title: string, description: string | null, deadline: string | null, groupsIdList: number[], createdBy: User): number {
+    addTask(title: string, description: string | null, deadline: string | null, groupsIdList: number[], createdBy: User, locked: boolean): number {
         const jsonData = this.file.getFileAsJson();
         const newId = IdGetter(jsonData);
 
-        const newTask = new Task(newId, title, description, deadline, groupsIdList, DateTime.getFullTimestamp(), createdBy, "toDo");
+        const newTask = new Task(newId, title, description, deadline, groupsIdList, DateTime.getFullTimestamp(), createdBy, "toDo", locked ?? false);
 
         if(description == null || isOnlyWhitespace(description)){
             newTask.description = null;
@@ -35,7 +35,7 @@ export class TaskModule {
         return newId;
     }
 
-    updateTask(id: number, title: string, description: string | null, deadline: string | null, groupsIdList: number[], status: string): number {
+    updateTask(id: number, title: string, description: string | null, deadline: string | null, groupsIdList: number[], status: string, locked: boolean | null): number {
         const jsonData = this.file.getFileAsJson();
         const task = jsonData.find((item: any) => item.id === id);
 
@@ -48,6 +48,10 @@ export class TaskModule {
         task.deadline = deadline; 
         task.groupsIdList = groupsIdList;
         task.status = status;
+
+        if(locked != null){
+            task.locked = locked;
+        }
 
         if(isOnlyWhitespace(description ?? '')){
             task.description = null;

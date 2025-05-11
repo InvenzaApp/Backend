@@ -2,6 +2,7 @@ export type GroupJson = {
     id: number;
     title: string;
     usersIdList: number[];
+    locked: boolean;
 }
 
 export class Group{
@@ -9,6 +10,7 @@ export class Group{
         public id: number,
         public title: string,
         public usersIdList: number[],
+        public locked: boolean,
     ) {}
 
     static fromJson(json: GroupJson): Group {
@@ -16,6 +18,7 @@ export class Group{
             json.id,
             json.title,
             json.usersIdList,
+            json.locked,
         );
     }
 
@@ -24,6 +27,7 @@ export class Group{
             id: this.id,
             title: this.title,
             usersIdList: this.usersIdList,
+            locked: this.locked,
         }
     }
 }

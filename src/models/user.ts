@@ -8,6 +8,8 @@ export type UserJson = {
     organizationId: number;
     groupsIdList: number[];
     permissions: string[];
+    admin: boolean;
+    locked: boolean;
 }
 
 export class User{
@@ -21,6 +23,8 @@ export class User{
         public organizationId: number,
         public groupsIdList: number[],
         public permissions: string[],
+        public admin: boolean,
+        public locked: boolean,
     ) {}
 
     static fromJson(json: UserJson): User {
@@ -34,6 +38,8 @@ export class User{
             json.organizationId,
             json.groupsIdList,
             json.permissions,
+            json.admin,
+            json.locked,
         );
     }
 
@@ -48,6 +54,8 @@ export class User{
             organizationId: this.organizationId,
             groupsIdList: this.groupsIdList,
             permissions: this.permissions,
+            admin: this.admin,
+            locked: this.locked,
         }
     }
 }

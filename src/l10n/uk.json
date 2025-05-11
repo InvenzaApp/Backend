@@ -1,0 +1,15 @@
+{
+    "notification": "Сповіщення",
+
+    "group_created": "Створено нову групу",
+    "group_added": "Вас додано до групи",
+    "group_removed": "Вас видалено з групи",
+    "group_updated": "Групу оновлено",
+    "group_deleted": "Групу видалено",
+
+    "task_created": "Додано нове завдання",
+    "task_added": "Вас призначено до завдання",
+    "task_removed": "Вас видалено із завдання",
+    "task_updated": "Завдання оновлено",
+    "task_deleted": "Завдання видалено"
+}

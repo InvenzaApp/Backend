@@ -61,7 +61,7 @@ class OrganizationModule {
     }
 
     updateOrganization(organizationId: number, title: string, street: string, buildingNumber: string, apartmentNumber: string,
-        postCode: string, city: string, country: string
+        postCode: string, city: string, country: string, locked: boolean | null
     ): boolean{
         const jsonData = this.file.getFileAsJson();
         const organization = jsonData.find((item: any) => item.id === organizationId);
@@ -75,6 +75,10 @@ class OrganizationModule {
         organization.address.postCode = postCode;
         organization.address.city = city;
         organization.address.country = country;
+
+        if(locked != null){
+            organization.locked = locked;
+        }
 
         this.file.saveJsonAsFile(jsonData);
         return true;
