@@ -19,7 +19,7 @@ export class GroupModule{
             .map((group: any) => Group.fromJson(group));
     }
 
-    addGroup(name: string, usersIdList: number[]): number {
+    addGroup(name: string, usersIdList: number[], locked: boolean): number {
         const jsonData = this.file.getFileAsJson();
         const newId = IdGetter(jsonData);
 
@@ -27,6 +27,7 @@ export class GroupModule{
             newId,
             name,
             usersIdList,
+            locked
         );
 
         jsonData.push(newGroup.toJson());
@@ -54,13 +55,17 @@ export class GroupModule{
         return group;
     }
 
-    updateGroup(groupId: number, name: string, usersIdList: number[]) {
+    updateGroup(groupId: number, name: string, usersIdList: number[], locked: boolean | null) {
         const jsonData = this.file.getFileAsJson();
 
         const group = jsonData.find((item: any) => item.id == groupId);
 
         group.title = name;
         group.usersIdList = usersIdList;
+
+        if(locked != null){
+            group.locked = locked;
+        }
 
         this.file.saveJsonAsFile(jsonData);
     }

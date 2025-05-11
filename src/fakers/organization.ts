@@ -6,5 +6,6 @@ export const defaultOrganization = {
     'title': 'Invenza',
     'usersIdList': [adminFaker.id],
     'adminId': adminFaker.id,
-    'address': addressFaker
+    'address': addressFaker,
+    'locked': true
 }

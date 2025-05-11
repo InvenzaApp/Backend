@@ -16,7 +16,6 @@ const tokenManager = new TokenManager()
 const taskModule = new TaskModule();
 const userModule = new UserModule();
 const notifications = new NotificationsManager();
-const localeManager = new LocaleManager();
 
 router.get('/', authMiddleware, (req, res) => {
     const { userId } = (req as any).user;
@@ -38,7 +37,7 @@ router.get('/:id', authMiddleware, (req, res) => {
 });
 
 router.post('/', authMiddleware, (req, res) => {
-   const { name, usersIdList } = req.body;
+   const { name, usersIdList, locked } = req.body;
     const { userId } = (req as any).user;
     const token = tokenManager.getAccessToken(userId);
 
@@ -47,7 +46,7 @@ router.post('/', authMiddleware, (req, res) => {
        return;
    }
 
-   const groupId = groupModule.addGroup(name, usersIdList);
+   const groupId = groupModule.addGroup(name, usersIdList, locked ?? false);
 
    notifications.sendNotificationToUsers(usersIdList, "group_created");
 
@@ -55,7 +54,7 @@ router.post('/', authMiddleware, (req, res) => {
 });
 
 router.put('/:id', authMiddleware, (req, res) => {
-    const { name, usersIdList } = req.body;
+    const { name, usersIdList, locked } = req.body;
     const { userId } = (req as any).user;
     const token = tokenManager.getAccessToken(userId);
 
@@ -71,7 +70,7 @@ router.put('/:id', authMiddleware, (req, res) => {
     notifications.sendNotificationToUsers(deletedUsers, "group_removed");
     notifications.sendNotificationToUsers(addedUsers, "group_added");
 
-    groupModule.updateGroup(groupId, name, usersIdList);
+    groupModule.updateGroup(groupId, name, usersIdList, locked);
     userModule.updateUserGroups(usersIdList, groupId);
 
     const notifyUsersIdList = usersIdList.filter((userId: number) => !addedUsers.includes(userId));

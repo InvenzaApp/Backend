@@ -7,7 +7,8 @@ export type OrganizationJson = {
     title: string;
     usersIdList: number[];
     adminId: number;
-    address: AddressJson
+    address: AddressJson;
+    locked: boolean;
 }
 
 const userModule = new UserModule();
@@ -19,6 +20,7 @@ export class Organization {
         public users: User[],
         public admin: User,
         public address: Address,
+        public locked: boolean,
     ) {
     }
 
@@ -29,6 +31,7 @@ export class Organization {
             userModule.getUsersById(json.usersIdList),
             userModule.getUserById(json.adminId),
             Address.fromJson(json.address),
+            json.locked,
         );
     }
 
@@ -38,7 +41,8 @@ export class Organization {
             title: this.title,
             usersIdList: this.users.map(userJson => userJson.id),
             adminId: this.admin.id,
-            address: this.address.toJson()
+            address: this.address.toJson(),
+            locked: this.locked,
         }
     }
 }
