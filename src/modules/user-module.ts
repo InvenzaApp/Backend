@@ -66,7 +66,7 @@ class UserModule {
         return jsonData.map((user: any) => User.fromJson(user));
     }
 
-    createUser(organizationId: number, name: string, lastname: string, email: string, password: string, groupsIdList: number[] | null, permissions: string[] | null, admin: boolean): User | string {
+    createUser(organizationId: number, name: string, lastname: string, email: string, password: string, groupsIdList: number[] | null, permissions: string[] | null, admin: boolean, locked: boolean): User | string {
         const jsonData = this.file.getFileAsJson();
 
         const userExists = jsonData.find((user: any) => user.email === email);
@@ -88,6 +88,7 @@ class UserModule {
             groupsIdList ?? [],
             permissions ?? [],
             admin,
+            locked ?? false
         );
 
         jsonData.push(newUser.toJson());
@@ -97,7 +98,7 @@ class UserModule {
         return newUser;
     }
 
-    updateUser(userId: number, name: string, lastname: string, email: string, groupsIdList: number[] | null, permissions: string[] | null, admin: boolean | null){
+    updateUser(userId: number, name: string, lastname: string, email: string, groupsIdList: number[] | null, permissions: string[] | null, admin: boolean | null, locked: boolean | null){
         const jsonData = this.file.getFileAsJson();
         const user = jsonData.find((item: any) => item.id === userId);
 
@@ -110,6 +111,10 @@ class UserModule {
         
         if(admin != null){
             user.admin = admin;
+        }
+
+        if(locked != null){
+            user.locked = locked;
         }
 
         this.file.saveJsonAsFile(jsonData);

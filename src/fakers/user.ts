@@ -17,4 +17,5 @@ export const adminFaker = new User(
     [0],
     adminPermissions,
     true,
+    true,
 );

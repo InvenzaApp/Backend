@@ -10,6 +10,7 @@ export type TaskJson = {
     createdAt: string;
     createdById: number;
     status: string;
+    locked: boolean;
 }
 
 const userModule = new UserModule();
@@ -24,6 +25,7 @@ export class Task{
         public createdAt: string,
         public createdBy: User,
         public status: string,
+        public locked: boolean,
     ) {}
 
     static fromJson(json: TaskJson): Task {
@@ -36,6 +38,7 @@ export class Task{
             json.createdAt,
             userModule.getUserById(json.createdById),
             json.status,
+            json.locked,
         );
     }
 
@@ -49,6 +52,7 @@ export class Task{
             createdAt: this.createdAt,
             createdById: this.createdBy.id,
             status: this.status,
+            locked: this.locked,
         }
     }
 }
