@@ -23,7 +23,7 @@ router.post('/organization-update', authMiddleware, (req, res) => {
     const { userId } = (req as any).user;
     const token = tokenManager.getAccessToken(userId);
 
-    const { title, street, buildingNumber, apartmentNumber, postCode, city, country } = req.body;
+    const { title, street, buildingNumber, apartmentNumber, postCode, city, country, locked } = req.body;
 
     if(!title || !street || !buildingNumber || !postCode || !city || !country){
         performFailureResponse(res, INVALID_REQUEST_PARAMETERS);
@@ -32,7 +32,7 @@ router.post('/organization-update', authMiddleware, (req, res) => {
 
     const organization = organizationModule.getOrganizationByUserId(userId);
 
-    const success = organizationModule.updateOrganization(organization.id, title, street, buildingNumber, apartmentNumber, postCode, city, country);
+    const success = organizationModule.updateOrganization(organization.id, title, street, buildingNumber, apartmentNumber, postCode, city, country, locked);
     
     performSuccessResponse(res, success, token);
 });
