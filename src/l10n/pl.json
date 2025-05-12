@@ -11,5 +11,7 @@
     "task_added": "Przypisano cię do zadania",
     "task_removed": "Usunięto cię z zadania",
     "task_updated": "Zaktualizowano zadanie",
-    "task_deleted": "Usunięto zadanie"
+    "task_deleted": "Usunięto zadanie",
+    
+    "comment_added": "Dodano komentarz do zadania"
 }

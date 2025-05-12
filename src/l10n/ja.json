@@ -11,5 +11,7 @@
     "task_added": "タスクに割り当てられました",
     "task_removed": "タスクから削除されました",
     "task_updated": "タスクが更新されました",
-    "task_deleted": "タスクが削除されました"
+    "task_deleted": "タスクが削除されました",
+
+    "comment_added": "タスクにコメントが追加されました"
 }

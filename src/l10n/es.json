@@ -11,5 +11,7 @@
     "task_added": "Has sido asignado/a a la tarea",
     "task_removed": "Has sido eliminado/a de la tarea",
     "task_updated": "La tarea ha sido actualizada",
-    "task_deleted": "La tarea ha sido eliminada"
+    "task_deleted": "La tarea ha sido eliminada",
+
+    "comment_added": "Comentario añadido a la tarea"
 }
