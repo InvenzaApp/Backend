@@ -11,5 +11,7 @@
     "task_added": "您已被分配到任务",
     "task_removed": "您已从任务中移除",
     "task_updated": "任务已更新",
-    "task_deleted": "任务已删除"
+    "task_deleted": "任务已删除",
+
+    "comment_added": "评论已添加到任务"
 }
