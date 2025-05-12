@@ -4,6 +4,7 @@ import tasksRouter from './routers/task';
 import organizationRouter from './routers/organization';
 import groupsRouter from './routers/group';
 import tokenRouter from './routers/token';
+import commentsRouter from './routers/comments';
 import permissionRouter from './routers/permission';
 import UserModule from './modules/user-module';
 import OrganizationModule from "./modules/organization-module";
@@ -30,6 +31,7 @@ app.use('/api/organization', organizationRouter);
 app.use('/api/groups', groupsRouter);
 app.use('/api/permissions', permissionRouter);
 app.use('/api/token', tokenRouter);
+app.use('/api/comments', commentsRouter);
 
 const initialize = () => {
    new SettingsModule();

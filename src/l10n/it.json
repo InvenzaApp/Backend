@@ -11,5 +11,7 @@
     "task_added": "Sei stato/a assegnato/a all'attività",
     "task_removed": "Sei stato/a rimosso/a dall'attività",
     "task_updated": "L'attività è stata aggiornata",
-    "task_deleted": "L'attività è stata eliminata"
+    "task_deleted": "L'attività è stata eliminata",
+
+    "comment_added": "Commento aggiunto all'attività"
 }

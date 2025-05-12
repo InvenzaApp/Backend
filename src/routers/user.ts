@@ -153,4 +153,15 @@ router.post('/update-user', authMiddleware, (req, res) => {
     }
 });
 
+router.get('/get-user/:id', authMiddleware, (req, res) => {
+    const { userId } = (req as any).user;
+    const token = tokenManager.getAccessToken(userId);
+
+    const resourceId = Number(req.params.id);
+
+    const user = userModule.getUserById(resourceId);
+
+    performSuccessResponse(res, user, token);
+});
+
 export default router;

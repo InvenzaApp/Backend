@@ -17,18 +17,18 @@ const userModule = new UserModule();
 const notifications = new NotificationsManager();
 
 router.post('/', authMiddleware, (req, res) => {
-    const { title, description, deadline, groupsIdList, locked } = req.body;
+    const { title, description, deadline, groupsIdList, locked, commentsEnabled } = req.body;
     const { userId } = (req as any).user;
     const token = tokenManager.getAccessToken(userId);
 
-    if(!title || !groupsIdList){
+    if(!title || !groupsIdList || commentsEnabled == null){
         performFailureResponse(res, INVALID_REQUEST_PARAMETERS);
         return;
     }
 
     const user = userModule.getUserById(userId);
 
-    const taskId = taskModule.addTask(title, description, deadline, groupsIdList, user, locked ?? false);
+    const taskId = taskModule.addTask(title, description, deadline, groupsIdList, user, locked ?? false, commentsEnabled);
 
     notifications.sendNotificationToGroups(groupsIdList, "task_created");
 
@@ -37,11 +37,11 @@ router.post('/', authMiddleware, (req, res) => {
 
 router.put('/:id', authMiddleware, (req, res) => {
     const id = Number(req.params.id);
-    const { title, description, deadline, groupsIdList, status, locked } = req.body;
+    const { title, description, deadline, groupsIdList, status, locked, commentsEnabled } = req.body;
     const { userId } = (req as any).user;
     const token = tokenManager.getAccessToken(userId);
 
-    if(!title || !groupsIdList){
+    if(!title || !groupsIdList || commentsEnabled == null){
         performFailureResponse(res, INVALID_REQUEST_PARAMETERS);
         return;
     }
@@ -51,7 +51,7 @@ router.put('/:id', authMiddleware, (req, res) => {
     notifications.sendNotificationToGroups(deletedGroups, "task_removed");
     notifications.sendNotificationToGroups(addedGroups, "task_added");
 
-    const taskId = taskModule.updateTask(id, title, description, deadline, groupsIdList, status, locked);
+    const taskId = taskModule.updateTask(id, title, description, deadline, groupsIdList, status, locked, commentsEnabled);
 
     const notifyGroupsIdList = groupsIdList.filter((groupId: number) => !addedGroups.includes(groupId));
 

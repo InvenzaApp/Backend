@@ -11,5 +11,7 @@
     "task_added": "You have been assigned to the task",
     "task_removed": "You have been removed from the task",
     "task_updated": "Task has been updated",
-    "task_deleted": "Task has been deleted"
+    "task_deleted": "Task has been deleted",
+
+    "comment_added": "Comment added to the task"
 }

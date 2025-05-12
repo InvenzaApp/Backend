@@ -7,5 +7,5 @@ export const defaultOrganization = {
     'usersIdList': [adminFaker.id],
     'adminId': adminFaker.id,
     'address': addressFaker,
-    'locked': true
+    'locked': false
 }

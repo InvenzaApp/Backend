@@ -8,6 +8,7 @@ import {DateTime} from "../helpers/date-time";
 import OrganizationModule from "./organization-module";
 import UserModule from "./user-module";
 import { isOnlyWhitespace } from "../helpers/whitespace";
+import { TaskComment } from "../models/comment";
 
 export class TaskModule {
     file = new FileManager("database", "tasks");
@@ -19,11 +20,29 @@ export class TaskModule {
         this.file.initializeFile();
     }
 
-    addTask(title: string, description: string | null, deadline: string | null, groupsIdList: number[], createdBy: User, locked: boolean): number {
+    addTask(title: string, 
+        description: string | null, 
+        deadline: string | null, 
+        groupsIdList: number[], 
+        createdBy: User, 
+        locked: boolean,
+        commentsEnabled: boolean,
+    ): number {
         const jsonData = this.file.getFileAsJson();
         const newId = IdGetter(jsonData);
 
-        const newTask = new Task(newId, title, description, deadline, groupsIdList, DateTime.getFullTimestamp(), createdBy, "toDo", locked ?? false);
+        const newTask = new Task(
+            newId, 
+            title, 
+            description, 
+            deadline, 
+            groupsIdList, 
+            DateTime.getFullTimestamp(), 
+            createdBy, "toDo", 
+            locked ?? false,
+            [],
+            commentsEnabled,
+        );
 
         if(description == null || isOnlyWhitespace(description)){
             newTask.description = null;
@@ -35,7 +54,15 @@ export class TaskModule {
         return newId;
     }
 
-    updateTask(id: number, title: string, description: string | null, deadline: string | null, groupsIdList: number[], status: string, locked: boolean | null): number {
+    updateTask(id: number, 
+        title: string, 
+        description: string | null, 
+        deadline: string | null, 
+        groupsIdList: number[], 
+        status: string, 
+        locked: boolean | null,
+        commentsEnabled: boolean,
+    ): number {
         const jsonData = this.file.getFileAsJson();
         const task = jsonData.find((item: any) => item.id === id);
 
@@ -48,6 +75,7 @@ export class TaskModule {
         task.deadline = deadline; 
         task.groupsIdList = groupsIdList;
         task.status = status;
+        task.commentsEnabled = commentsEnabled;
 
         if(locked != null){
             task.locked = locked;
@@ -156,5 +184,53 @@ export class TaskModule {
         });
 
         this.file.saveJsonAsFile(tasksList);
+    }
+
+    getComments(taskId: number): TaskComment[]{
+        const jsonData = this.file.getFileAsJson();
+        const task = jsonData.find((item: any) => item.id === taskId);
+
+        if(!task) return [];
+
+        const commentsList = task.comments.map((item: any) => TaskComment.fromJson(item));
+
+        return commentsList;
+    }
+
+    addComment(taskId: number, userId: number, title: string){
+        const jsonData = this.file.getFileAsJson();
+        const task = jsonData.find((item: any) => item.id === taskId);
+
+        if(!task) return;
+
+        const commentId = IdGetter(task.comments);
+
+        const comment = new TaskComment(
+            commentId,
+            userId,
+            title,
+            DateTime.getFullTimestamp(),
+            false,
+            null
+        );
+
+        task.comments.push(comment.toJson());
+
+        this.file.saveJsonAsFile(jsonData);
+    }
+
+    deleteComment(taskId: number, commentId: number){
+        const jsonData = this.file.getFileAsJson();
+        const task = jsonData.find((item: any) => item.id === taskId);
+
+        if(!task) return;
+
+        const comment = task.comments.find((item: any) => item.id === commentId);
+
+        if(!comment) return;
+
+        comment.deleted = true;
+
+        this.file.saveJsonAsFile(jsonData);
     }
 }

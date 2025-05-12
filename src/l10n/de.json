@@ -11,5 +11,7 @@
     "task_added": "Sie wurden der Aufgabe zugewiesen",
     "task_removed": "Sie wurden von der Aufgabe entfernt",
     "task_updated": "Aufgabe wurde aktualisiert",
-    "task_deleted": "Aufgabe wurde gelöscht"
+    "task_deleted": "Aufgabe wurde gelöscht",
+
+    "comment_added": "Kommentar zur Aufgabe hinzugefügt"
 }
