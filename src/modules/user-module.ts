@@ -36,9 +36,11 @@ class UserModule {
         }
     }
 
-    getUserById(id: number): User {
+    getUserById(id: number): User | null {
         const jsonData = this.file.getFileAsJson();
         const userJson = jsonData.find((user: any) => user.id === id);
+
+        if(!userJson) return null;
 
         return User.fromJson(userJson);
     }
