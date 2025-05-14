@@ -1,87 +1,129 @@
 import FileManager from "../managers/file-manager";
-import {Group} from "../models/group";
+import { Group, GroupJson } from "../models/group";
 import IdGetter from "../helpers/id-getter";
 import UserModule from "./user-module";
-import {User} from "../models/user";
+import { User } from "../models/user";
 
 export class GroupModule{
     file = new FileManager("database", "groups");
     userModule = new UserModule();
+
     constructor() {
         this.file.initializeFile();
     }
 
     getGroups(userId: number): Group[]{
-        const jsonData = this.file.getFileAsJson();
+        const jsonData: GroupJson[] = this.file.getFileAsJson();
 
-        return jsonData
-            .filter((group: any) => group.usersIdList.some((item: any) => item == userId))
-            .map((group: any) => Group.fromJson(group));
+        const filteredData: GroupJson[] = jsonData.filter((groupJson) => {
+            return groupJson.usersIdList.some((item) => item === userId);
+        });
+
+        const groupsList: Group[] = filteredData.flatMap((item) => {
+            const group = Group.fromJson(item);
+
+            if(!group) return [];
+
+            const usersList: User[] = this.userModule.getUsersById(group.usersIdList);
+
+            group.usersList = usersList;
+
+            return group;
+        });
+
+        return groupsList;
+            
     }
 
-    addGroup(name: string, usersIdList: number[], locked: boolean): number {
-        const jsonData = this.file.getFileAsJson();
-        const newId = IdGetter(jsonData);
+    addGroup(
+        title: string, 
+        usersIdList: number[], 
+        locked: boolean
+    ): Group | null {
+        const jsonData: GroupJson[] = this.file.getFileAsJson();
 
-        const newGroup = new Group(
-            newId,
-            name,
-            usersIdList,
-            locked
-        );
+        const newId: number = IdGetter(jsonData);
+
+        const newGroup = new Group({
+            id: newId,
+            title: title,
+            usersIdList: usersIdList,
+            usersList: null,
+            locked: locked,
+        });
 
         jsonData.push(newGroup.toJson());
 
-        this.userModule.addGroupToUsers(newId, usersIdList);
+        const success = this.userModule.addGroupToUsers(newId, usersIdList);
 
         this.file.saveJsonAsFile(jsonData);
 
-        return newId;
+        return success ? newGroup : null;
     }
 
-    getGroup(id: number): any {
-        const jsonData = this.file.getFileAsJson();
-        const group = jsonData.find((item: any) => item.id == id);
+    getGroup(id: number): Group | null {
+        const jsonData: GroupJson[] = this.file.getFileAsJson();
+
+        const groupJson: GroupJson | undefined = jsonData.find((item) => item.id == id);
+
+        if(!groupJson) return null;
+
+        const group = Group.fromJson(groupJson);
+
+        if(!group) return null;
 
         const tmpList: User[] = [];
 
         group.usersIdList.forEach((userId: number) => {
             const user = this.userModule.getUserById(userId);
-            tmpList.push(user);
+
+            if(user != null) tmpList.push(user);
         });
 
-        group.usersList = tmpList.map((user: User) => user.toJson());
+        group.usersList = tmpList;
 
         return group;
     }
 
-    updateGroup(groupId: number, name: string, usersIdList: number[], locked: boolean | null) {
-        const jsonData = this.file.getFileAsJson();
+    updateGroup(
+        groupId: number, 
+        name: string, 
+        usersIdList: number[], 
+        locked: boolean | null
+    ): boolean {
+        const jsonData: GroupJson[] = this.file.getFileAsJson();
 
-        const group = jsonData.find((item: any) => item.id == groupId);
+        const groupJson: GroupJson | undefined = jsonData.find((item) => item.id == groupId);
 
-        group.title = name;
-        group.usersIdList = usersIdList;
+        if(!groupJson) return false;
+
+        groupJson.title = name;
+        groupJson.usersIdList = usersIdList;
 
         if(locked != null){
-            group.locked = locked;
+            groupJson.locked = locked;
         }
 
         this.file.saveJsonAsFile(jsonData);
+
+        return true;        
     }
 
-    getRemovedUsersIdListOnUpdate(newUsersIdList: number[], groupId: number): number[] {
-        const jsonData = this.file.getFileAsJson();
+    getRemovedUsersIdListOnUpdate(
+        newUsersIdList: number[], 
+        groupId: number
+    ): number[] {
+        const jsonData: GroupJson[] = this.file.getFileAsJson();
 
-        const foundGroup = jsonData.find((group: any) => group.id === groupId);
+        const foundGroup: GroupJson | undefined = jsonData.find((group) => group.id === groupId);
 
         if(!foundGroup) return [];
 
-        const usersIdList = foundGroup.usersIdList;
+        const usersIdList: number[] = foundGroup.usersIdList;
 
         var tmpList: number[] = [];
 
-        usersIdList.forEach((userId: number) => {
+        usersIdList.forEach((userId) => {
             if(!newUsersIdList.includes(userId)){
                 tmpList.push(userId);
             }
@@ -90,18 +132,21 @@ export class GroupModule{
         return tmpList;
     }
 
-    getAddedUsersIdListOnUpdate(newUsersIdList: number[], groupId: number): number[] {
-        const jsonData = this.file.getFileAsJson();
+    getAddedUsersIdListOnUpdate(
+        newUsersIdList: number[], 
+        groupId: number
+    ): number[] {
+        const jsonData: GroupJson[] = this.file.getFileAsJson();
 
-        const foundGroup = jsonData.find((group: any) => group.id === groupId);
+        const foundGroup: GroupJson | undefined = jsonData.find((group) => group.id === groupId);
 
         if(!foundGroup) return [];
 
-        const usersIdList = foundGroup.usersIdList;
+        const usersIdList: number[] = foundGroup.usersIdList;
 
         var tmpList: number[] = [];
 
-        newUsersIdList.forEach((userId: number) => {
+        newUsersIdList.forEach((userId) => {
             if(!usersIdList.includes(userId)){
                 tmpList.push(userId);
             }
@@ -110,56 +155,79 @@ export class GroupModule{
         return tmpList;
     }
 
-    deleteGroup(groupId: number){
-        const jsonData = this.file.getFileAsJson();
-        const filteredData = jsonData.filter((item: any) => item.id !== groupId);
+    deleteGroup(groupId: number): boolean{
+        const jsonData: GroupJson[] = this.file.getFileAsJson();
+
+        const filteredData: GroupJson[] = jsonData.filter((item) => item.id !== groupId);
+
         this.file.saveJsonAsFile(filteredData);
-        this.userModule.deleteGroupFromUsers(groupId);
+
+        const success = this.userModule.deleteGroupFromUsers(groupId);
+
+        return success;
     }
 
-    getGroupNameById(id: number): string{
-        const jsonData = this.file.getFileAsJson();
-        const group = jsonData.find((item: any) => item.id === id);
+    getGroupNameById(id: number): string | null{
+        const jsonData: GroupJson[] = this.file.getFileAsJson();
+
+        const groupJson: GroupJson | undefined = jsonData.find((item) => item.id === id);
+
+        if(!groupJson) return null;
+
+        const group = Group.fromJson(groupJson);
+
+        if(!group) return null;
 
         return group.title;
     }
 
-    addUserToGroups(userId: number, groupsIdList: number[]){
-        const jsonData = this.file.getFileAsJson();
+    addUserToGroups(userId: number, groupsIdList: number[]): boolean{
+        const jsonData: GroupJson[] = this.file.getFileAsJson();
 
         (groupsIdList ?? []).forEach((groupId) => {
-            const group = jsonData.find((item: any) => item.id === groupId);
-            group.usersIdList.push(userId);
+            const groupJson: GroupJson | undefined = jsonData.find((item) => item.id === groupId);
+
+            if(!groupJson) return;
+
+            const group = Group.fromJson(groupJson);
+
+            if(group) group.usersIdList.push(userId);
         });
 
         this.file.saveJsonAsFile(jsonData);
+
+        return true;
     }
 
-    deleteUserFromGroups(userId: number){
-        const jsonData = this.file.getFileAsJson();
+    deleteUserFromGroups(userId: number): boolean{
+        const jsonData: GroupJson[] = this.file.getFileAsJson();
 
-        jsonData.forEach((group: any) => {
-            group.usersIdList = group.usersIdList.filter((id: any) => id !== userId);
+        jsonData.forEach((groupJson) => {
+            groupJson.usersIdList = groupJson.usersIdList.filter((id) => id !== userId);
         });
 
         this.file.saveJsonAsFile(jsonData);
+
+        return true;
     }
 
-    updateUserGroups(userId: number, groupsIdList: number[]){
-        const jsonData = this.file.getFileAsJson();
+    updateUserGroups(userId: number, groupsIdList: number[]): boolean{
+        const jsonData: GroupJson[] = this.file.getFileAsJson();
 
-        jsonData.forEach((group: any) => {
-            if(groupsIdList.includes(group.id)){
-                if(!group.usersIdList.includes(userId)){
-                    group.usersIdList.push(userId);
+        jsonData.forEach((groupJson) => {
+            if(groupsIdList.includes(groupJson.id)){
+                if(!groupJson.usersIdList.includes(userId)){
+                    groupJson.usersIdList.push(userId);
                 }
             }else{
-                if(group.usersIdList.includes(userId)){
-                    group.usersIdList = group.usersIdList.filter((item: any) => item != userId);
+                if(groupJson.usersIdList.includes(userId)){
+                    groupJson.usersIdList = groupJson.usersIdList.filter((item) => item != userId);
                 }
             }
         });
 
         this.file.saveJsonAsFile(jsonData);
+
+        return true;
     }
 }

@@ -4,7 +4,9 @@ import { authMiddleware } from "../authorization/api_authorization";
 import { TokenManager } from "../managers/token-manager";
 import { performFailureResponse, performSuccessResponse } from "../helpers/responses";
 import { INVALID_REQUEST_PARAMETERS } from "../helpers/response-codes";
+import { Event } from "../models/event";
 import OrganizationModule from "../modules/organization-module";
+import { Organization } from "../models/organization";
 
 const router = Router();
 const calendar = new CalendarModule();
@@ -13,16 +15,16 @@ const organizationModule = new OrganizationModule();
 
 router.get('/', authMiddleware, (req, res) => {
     const { userId } = (req as any).user;
-    const token = tokenManager.getAccessToken(userId);
+    const token: string = tokenManager.getAccessToken(userId);
 
-    const events = calendar.getEvents();
+    const events: Event[] = calendar.getEvents();
 
     performSuccessResponse(res, events, token);
 });
 
 router.post('/', authMiddleware, (req, res) => {
     const { userId } = (req as any).user;
-    const token = tokenManager.getAccessToken(userId);
+    const token: string = tokenManager.getAccessToken(userId);
 
     const { title, description, dateFrom, dateTo, locked } = req.body;
 
@@ -31,19 +33,32 @@ router.post('/', authMiddleware, (req, res) => {
         return;
     }
 
-    const organization = organizationModule.getOrganizationByUserId(userId);
+    const organization: Organization | null = organizationModule.getOrganizationByUserId(userId);
 
-    const eventId = calendar.addEvent(userId, organization.id, title, description, dateFrom, dateTo, locked ?? false);
+    if(!organization){
+        performFailureResponse(res, INVALID_REQUEST_PARAMETERS);
+        return;
+    }
 
-    performSuccessResponse(res, eventId, token);
+    const event = calendar.addEvent(
+        userId, 
+        organization.id, 
+        title, 
+        description, 
+        dateFrom, 
+        dateTo, 
+        locked ?? false
+    );
+
+    performSuccessResponse(res, event.id, token);
 });
 
 router.get('/:id', authMiddleware, (req, res) => {
     const { userId } = (req as any).user;
-    const token = tokenManager.getAccessToken(userId);
+    const token: string = tokenManager.getAccessToken(userId);
     const resourceId = Number(req.params.id);
 
-    const event = calendar.getEvent(resourceId);
+    const event: Event | null = calendar.getEvent(resourceId);
 
     if(!event){
         performFailureResponse(res, INVALID_REQUEST_PARAMETERS);
@@ -54,7 +69,7 @@ router.get('/:id', authMiddleware, (req, res) => {
 
 router.put('/:id', authMiddleware, (req, res) => {
     const { userId } = (req as any).user;
-    const token = tokenManager.getAccessToken(userId);
+    const token: string = tokenManager.getAccessToken(userId);
     const resourceId = Number(req.params.id);
 
     const { title, description, dateFrom, dateTo, locked } = req.body;
@@ -64,19 +79,27 @@ router.put('/:id', authMiddleware, (req, res) => {
         return;
     }
 
-    calendar.updateEvent(resourceId, title, description, dateFrom, dateTo, locked);
+    const success: boolean = calendar.updateEvent(resourceId, title, description, dateFrom, dateTo, locked);
 
-    performSuccessResponse(res, resourceId, token);
+    if(!success){
+        performFailureResponse(res, INVALID_REQUEST_PARAMETERS);
+    }else{
+        performSuccessResponse(res, resourceId, token);
+    }
 });
 
 router.delete('/:id', authMiddleware, (req, res) => {
     const { userId } = (req as any).user;
-    const token = tokenManager.getAccessToken(userId);
+    const token: string = tokenManager.getAccessToken(userId);
     const resourceId = Number(req.params.id);
 
-    calendar.deleteEvent(resourceId);
+    const success: boolean = calendar.deleteEvent(resourceId);
 
-    performSuccessResponse(res, true, token);
+    if(!success){
+        performFailureResponse(res, INVALID_REQUEST_PARAMETERS);
+    }else{
+        performSuccessResponse(res, true, token);
+    }
 });
 
 export default router;

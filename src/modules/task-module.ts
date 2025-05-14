@@ -1,14 +1,15 @@
 import FileManager from "../managers/file-manager";
-import {Task} from "../models/task";
+import { Task, TaskJson } from "../models/task";
 import IdGetter from "../helpers/id-getter";
-import {GroupModule} from "./group-module";
-import {Group} from "../models/group";
-import {User} from "../models/user";
-import {DateTime} from "../helpers/date-time";
+import { GroupModule } from "./group-module";
+import { Group } from "../models/group";
+import { User } from "../models/user";
+import { DateTime } from "../helpers/date-time";
 import OrganizationModule from "./organization-module";
 import UserModule from "./user-module";
 import { isOnlyWhitespace } from "../helpers/whitespace";
-import { TaskComment } from "../models/comment";
+import { TaskComment, TaskCommentJson } from "../models/comment";
+import { Organization } from "../models/organization";
 
 export class TaskModule {
     file = new FileManager("database", "tasks");
@@ -20,41 +21,51 @@ export class TaskModule {
         this.file.initializeFile();
     }
 
-    addTask(title: string, 
+    addTask(
+        title: string, 
         description: string | null, 
         deadline: string | null, 
         groupsIdList: number[], 
         createdBy: User, 
         locked: boolean,
         commentsEnabled: boolean,
-    ): number {
-        const jsonData = this.file.getFileAsJson();
-        const newId = IdGetter(jsonData);
+    ): Task | null{
+        const jsonData: TaskJson[] = this.file.getFileAsJson();
 
-        const newTask = new Task(
-            newId, 
-            title, 
-            description, 
-            deadline, 
-            groupsIdList, 
-            DateTime.getFullTimestamp(), 
-            createdBy, "toDo", 
-            locked ?? false,
-            [],
-            commentsEnabled,
-        );
+        const newId: number = IdGetter(jsonData);
+
+        const newTask = new Task({
+            id: newId, 
+            title: title, 
+            description: description, 
+            deadline: deadline, 
+            groupsIdList: groupsIdList, 
+            groupsList: null,
+            createdAt: DateTime.getFullTimestamp(), 
+            createdBy: createdBy, 
+            status: "toDo", 
+            locked: locked ?? false,
+            comments: [],
+            commentsEnabled: commentsEnabled,
+        });
 
         if(description == null || isOnlyWhitespace(description)){
             newTask.description = null;
         }
 
-        jsonData.push(newTask.toJson());
+        const taskJson = newTask.toJson();
+
+        if(!taskJson) return null;
+
+        jsonData.push(taskJson);
 
         this.file.saveJsonAsFile(jsonData);
-        return newId;
+
+        return newTask;
     }
 
-    updateTask(id: number, 
+    updateTask(
+        taskId: number, 
         title: string, 
         description: string | null, 
         deadline: string | null, 
@@ -62,45 +73,51 @@ export class TaskModule {
         status: string, 
         locked: boolean | null,
         commentsEnabled: boolean,
-    ): number {
-        const jsonData = this.file.getFileAsJson();
-        const task = jsonData.find((item: any) => item.id === id);
+    ): number | null {
+        const jsonData: TaskJson[] = this.file.getFileAsJson();
+        const taskJson: TaskJson | undefined = jsonData.find((item) => item.id === taskId);
 
-        if (!task) {
-            return id;
-        }
-
-        task.title = title;
-        task.description = description;
-        task.deadline = deadline; 
-        task.groupsIdList = groupsIdList;
-        task.status = status;
-        task.commentsEnabled = commentsEnabled;
+        if (!taskJson) return null;
+    
+        taskJson.title = title;
+        taskJson.description = description;
+        taskJson.deadline = deadline; 
+        taskJson.groupsIdList = groupsIdList;
+        taskJson.status = status;
+        taskJson.commentsEnabled = commentsEnabled;
 
         if(locked != null){
-            task.locked = locked;
+            taskJson.locked = locked;
         }
 
         if(isOnlyWhitespace(description ?? '')){
-            task.description = null;
+            taskJson.description = null;
         }
 
         this.file.saveJsonAsFile(jsonData);
 
-        return id;
+        return taskId;
     }
 
-    getDeletedGroupsIdListOnUpdate(newGroupsIdList: number[], taskId: number): number[]{
-        const jsonData = this.file.getFileAsJson();
+    getDeletedGroupsIdListOnUpdate(
+        newGroupsIdList: number[], 
+        taskId: number
+    ): number[] | null{
+        const jsonData: TaskJson[] = this.file.getFileAsJson();
 
-        const foundTask = jsonData.find((task: any) => task.id === taskId);
+        const taskJson: TaskJson | undefined = jsonData.find((item) => item.id === taskId);
 
-        if(!foundTask) return [];
+        if(!taskJson) return null;
 
-        const groupsIdList = foundTask.groupsIdList;
+        const task = Task.fromJson(taskJson);
+
+        if(!task) return null;
+
+        const groupsIdList = task.groupsIdList;
+
         var tmpList: number[] = [];
 
-        groupsIdList.forEach((groupId: number) => {
+        groupsIdList.forEach((groupId) => {
             if(!newGroupsIdList.includes(groupId)){
                 tmpList.push(groupId);
             }
@@ -109,17 +126,25 @@ export class TaskModule {
         return tmpList;
     }
 
-    getAddedGroupsIdListOnUpdate(newGroupsIdList: number[], taskId: number): number[]{
-        const jsonData = this.file.getFileAsJson();
+    getAddedGroupsIdListOnUpdate(
+        newGroupsIdList: number[], 
+        taskId: number
+    ): number[] | null{
+        const jsonData: TaskJson[] = this.file.getFileAsJson();
 
-        const foundTask = jsonData.find((task: any) => task.id === taskId);
+        const taskJson: TaskJson | undefined = jsonData.find((item) => item.id === taskId);
 
-        if(!foundTask) return [];
+        if(!taskJson) return null;
 
-        const groupsIdList = foundTask.groupsIdList;
+        const task = Task.fromJson(taskJson);
+
+        if(!task) return null;
+
+        const groupsIdList = task.groupsIdList
+        ;
         var tmpList: number[] = [];
 
-        newGroupsIdList.forEach((groupId: number) => {
+        newGroupsIdList.forEach((groupId) => {
             if(!groupsIdList.includes(groupId)){
                 tmpList.push(groupId);
             }
@@ -128,109 +153,159 @@ export class TaskModule {
         return tmpList;
     }
 
-    getTasks(userId: number): Task[] {
-        const jsonData = this.file.getFileAsJson();
-        const groups = this.groupModule.getGroups(userId);
-        const organization = this.organizationModule.getOrganizationByUserId(userId);
-        const admin = this.organizationModule.getOrganizationAdmin(organization.id);
-        const isAdmin = admin.id === userId;
+    getTasks(userId: number): Task[] | null{
+        const jsonData: TaskJson[] = this.file.getFileAsJson();
 
-        const groupsId = groups.map(group => group.id);
+        const groups: Group[] = this.groupModule.getGroups(userId);
 
-        const filteredData =  jsonData
-            .filter((group: any) => group.groupsIdList.some((item: any) => groupsId.includes(item))).map((task: any) => Task.fromJson(task));
+        const organization: Organization | null = this.organizationModule.getOrganizationByUserId(userId);
+        if(!organization) return null;
+
+        const isAdmin: boolean = organization.admin.id === userId;
+
+        const groupsIdList: number[] = groups.map(group => group.id);
+
+        const filteredData: Task[] = jsonData
+            .filter((task) => {
+                return task.groupsIdList.some((item) => {
+                    return groupsIdList.includes(item);
+                });
+            })
+            .flatMap((item: any) => {
+                const task = Task.fromJson(item);
+
+                if(!task) return [];
+
+                return task;
+            });
 
         if(!isAdmin){
             return filteredData;
         }
 
-        const unassignedTasks = jsonData.filter((task: any) => Array.isArray(task.groupsIdList) && task.groupsIdList.length === 0)
-            .map((task: any) => Task.fromJson(task));
+        const unassignedTasks: Task[] = jsonData
+        .filter((task) => {
+            return Array.isArray(task.groupsIdList) && task.groupsIdList.length === 0;
+        })
+        .flatMap((item: any) => {
+            const task = Task.fromJson(item);
+
+            if(!task) return [];
+
+            return task;
+        });
 
         return [...unassignedTasks, ...filteredData];
     }
 
-    getTask(resourceId: number): Task {
-        const jsonData = this.file.getFileAsJson();
-        const task = jsonData.find((item: any) => item.id === resourceId);
+    getTask(resourceId: number): Task | null{
+        const jsonData: TaskJson[] = this.file.getFileAsJson();
+        const taskJson: TaskJson | undefined = jsonData.find((item) => item.id === resourceId);
+        
+        if(!taskJson) return null;
 
-        const groupsIdList = task.groupsIdList;
+        const task: Task | null = Task.fromJson(taskJson);
+
+        if(!task) return null;
+
+        const groupsIdList: number[] = task.groupsIdList;
 
         let tmpList: Group[] = [];
 
-        groupsIdList.forEach((group: any) => {
-            const item = this.groupModule.getGroup(group);
-            tmpList.push(item);
+        groupsIdList.forEach((item) => {
+            const group = this.groupModule.getGroup(item);
+
+            if(group) tmpList.push(group);
         })
 
         task.groupsList = tmpList;
-        task.createdBy = this.userModule.getUserById(task.createdById);
 
         return task;
     }
 
-    deleteTask(resourceId: number) {
-        const jsonData = this.file.getFileAsJson();
-        const newData = jsonData.filter((item: any) => item.id !== resourceId);
-        this.file.saveJsonAsFile(newData);
+    deleteTask(resourceId: number): boolean{
+        const jsonData: TaskJson[] = this.file.getFileAsJson();
+
+        const filteredData: TaskJson[] | undefined = jsonData.filter((item) => item.id !== resourceId);
+
+        if(!filteredData) return false;
+
+        this.file.saveJsonAsFile(filteredData);
+
+        return true;
     }
 
-    removeGroupFromTasks(groupId: number) {
-        const tasksList = this.file.getFileAsJson();
+    removeGroupFromTasks(groupId: number): boolean{
+        const tasksList: TaskJson[] = this.file.getFileAsJson();
 
-        tasksList.filter((item: any) => item.groupsIdList.includes(groupId)).forEach((task: any) => {
-            const groupsList = task.groupsIdList;
-            task.groupsIdList = groupsList.filter((groupItem: any) => groupItem !== groupId);
+        tasksList
+        .filter((item) => item.groupsIdList.includes(groupId))
+        .forEach((item) => {
+            const groupsList: number[] = item.groupsIdList;
+            item.groupsIdList = groupsList.filter((group) => group !== groupId);
         });
 
         this.file.saveJsonAsFile(tasksList);
+
+        return true;
     }
 
-    getComments(taskId: number): TaskComment[]{
-        const jsonData = this.file.getFileAsJson();
-        const task = jsonData.find((item: any) => item.id === taskId);
+    getComments(taskId: number): TaskComment[] | null{
+        const jsonData: TaskJson[] = this.file.getFileAsJson();
 
-        if(!task) return [];
+        const taskJson: TaskJson | undefined = jsonData.find((item: any) => item.id === taskId);
 
-        const commentsList = task.comments.map((item: any) => TaskComment.fromJson(item));
+        if(!taskJson) return null;
+
+        const commentsList: TaskComment[] = taskJson.comments.flatMap((item) => {
+            const comment: TaskComment | null = TaskComment.fromJson(item);
+
+            if(!comment) return [];
+
+            return comment;
+        });
 
         return commentsList;
     }
 
-    addComment(taskId: number, userId: number, title: string){
-        const jsonData = this.file.getFileAsJson();
-        const task = jsonData.find((item: any) => item.id === taskId);
+    addComment(taskId: number, userId: number, title: string): boolean{    
+        const jsonData: TaskJson[] = this.file.getFileAsJson();
+        const taskJson: TaskJson | undefined = jsonData.find((item) => item.id === taskId);
 
-        if(!task) return;
+        if(!taskJson) return false;
 
-        const commentId = IdGetter(task.comments);
+        const taskCommentId: number = IdGetter(taskJson.comments);
 
-        const comment = new TaskComment(
-            commentId,
-            userId,
-            title,
-            DateTime.getFullTimestamp(),
-            false,
-            null
-        );
+        const comment = new TaskComment({
+            id: taskCommentId,
+            userId: userId,
+            title: title,
+            publishDate: DateTime.getFullTimestamp(),
+            deleted: false,
+            author: null,
+        });
 
-        task.comments.push(comment.toJson());
+        taskJson.comments.push(comment.toJson());
 
         this.file.saveJsonAsFile(jsonData);
+
+        return true;
     }
 
-    deleteComment(taskId: number, commentId: number){
-        const jsonData = this.file.getFileAsJson();
-        const task = jsonData.find((item: any) => item.id === taskId);
+    deleteComment(taskId: number, commentId: number): boolean{
+        const jsonData: TaskJson[] = this.file.getFileAsJson();
+        const taskJson: TaskJson | undefined = jsonData.find((item) => item.id === taskId);
 
-        if(!task) return;
+        if(!taskJson) return false;
 
-        const comment = task.comments.find((item: any) => item.id === commentId);
+        const comment = taskJson.comments.find((item: any) => item.id === commentId);
 
-        if(!comment) return;
+        if(!comment) return false;
 
         comment.deleted = true;
 
         this.file.saveJsonAsFile(jsonData);
+
+        return true;
     }
 }

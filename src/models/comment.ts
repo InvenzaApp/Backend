@@ -1,5 +1,14 @@
 import { User, UserJson } from "./user";
 
+interface CommentParams {
+    id: number;
+    userId: number;
+    title: string;
+    publishDate: string;
+    deleted: boolean;
+    author: User | null;
+}
+
 export type TaskCommentJson = {
     id: number;
     userId: number;
@@ -10,24 +19,31 @@ export type TaskCommentJson = {
 }
 
 export class TaskComment{
-    constructor(
-        public id: number,
-        public userId: number,
-        public title: string,
-        public publishDate: string,
-        public deleted: boolean,
-        public author: User | null,
-    ){}
+    public id: number;
+    public userId: number;
+    public title: string;
+    public publishDate: string;
+    public deleted: boolean;
+    public author: User | null;
+
+    constructor(params: CommentParams){
+        this.id = params.id;
+        this.userId = params.userId;
+        this.title = params.title;
+        this.publishDate = params.publishDate;
+        this.deleted = params.deleted;
+        this.author = params.author;
+    }
 
     static fromJson(json: TaskCommentJson): TaskComment{
-        return new TaskComment(
-            json.id,
-            json.userId,
-            json.title,
-            json.publishDate,
-            json.deleted,
-            null,
-        );
+        return new TaskComment({
+            id: json.id,
+            userId: json.userId,
+            title: json.title,
+            publishDate: json.publishDate,
+            deleted: json.deleted,
+            author: null,
+        });
     }
 
     toJson(): TaskCommentJson{
