@@ -1,6 +1,15 @@
-import {User} from "./user";
+import { User } from "./user";
 import UserModule from "../modules/user-module";
 import { Address, AddressJson } from "./address";
+
+interface OrganizationParams{
+    id: number;
+    title: string;
+    users: User[];
+    admin: User;
+    address: Address;
+    locked: boolean;
+}
 
 export type OrganizationJson = {
     id: number;
@@ -14,25 +23,39 @@ export type OrganizationJson = {
 const userModule = new UserModule();
 
 export class Organization {
-    constructor(
-        public id: number,
-        public title: string,
-        public users: User[],
-        public admin: User,
-        public address: Address,
-        public locked: boolean,
-    ) {
+    public id: number;
+    public title: string;
+    public users: User[];
+    public admin: User;
+    public address: Address;
+    public locked: boolean;
+
+    constructor(params: OrganizationParams) {
+        this.id = params.id,
+        this.title = params.title,
+        this.users = params.users,
+        this.admin = params.admin,
+        this.address = params.address,
+        this.locked = params.locked
     }
 
-    static fromJson(json: OrganizationJson): Organization {
-        return new Organization(
-            json.id,
-            json.title,
-            userModule.getUsersById(json.usersIdList),
-            userModule.getUserById(json.adminId),
-            Address.fromJson(json.address),
-            json.locked,
-        );
+    static fromJson(json: OrganizationJson): Organization | null {
+        const admin: User | undefined = userModule.getUserById(json.adminId);
+        const users: User[] | undefined = userModule.getUsersById(json.usersIdList);
+        const address: Address | undefined = Address.fromJson(json.address);
+
+        if(!admin) return null;
+        if(!users) return null;
+        if(!address) return null;
+
+        return new Organization({
+            id: json.id,
+            title: json.title,
+            users: users,
+            admin: admin,
+            address: address,
+            locked: json.locked,
+        });
     }
 
     toJson(): OrganizationJson {

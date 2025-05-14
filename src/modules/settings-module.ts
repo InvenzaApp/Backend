@@ -1,4 +1,5 @@
 import FileManager from "../managers/file-manager";
+import { UserSettingsJson } from "../models/user-settings";
 
 export class SettingsModule{
     file = new FileManager("database", "user-settings");
@@ -7,32 +8,39 @@ export class SettingsModule{
         this.file.initializeFile();
     }
 
-    changeLanguage(userId: number, locale: string | undefined){
-        const jsonData = this.file.getFileAsJson();
+    changeLanguage(
+        userId: number, 
+        locale: string | undefined
+    ): boolean{
+        const jsonData: UserSettingsJson[] = this.file.getFileAsJson();
 
-        const foundUser = jsonData.find((user: any) => user.userId === userId);
+        const userSettingsJson: UserSettingsJson | undefined = jsonData.find((item) => item.userId === userId);
 
-        if(foundUser){
+        if(userSettingsJson){
             if(locale != null){
-                foundUser.locale = locale;
+                userSettingsJson.locale = locale;
             }
         }else{
-            const newUser = {
+            const newSettings: UserSettingsJson = {
                 'userId': userId,
                 'locale': locale ?? 'pl'
             }
     
-            jsonData.push(newUser);
+            jsonData.push(newSettings);
         }
 
         this.file.saveJsonAsFile(jsonData);
+
+        return true;
     }
 
-    removeLanguage(userId: number){
-        const jsonData = this.file.getFileAsJson();
+    removeLanguage(userId: number): boolean{
+        const jsonData: UserSettingsJson[] = this.file.getFileAsJson();
 
-        const filteredData = jsonData.filter((user: any) => user.userId !== userId);
+        const filteredData: UserSettingsJson[] = jsonData.filter((item) => item.userId !== userId);
 
         this.file.saveJsonAsFile(filteredData);
+
+        return true;
     }
 }

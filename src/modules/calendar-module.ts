@@ -1,7 +1,8 @@
 import FileManager from "../managers/file-manager";
 import IdGetter from "../helpers/id-getter";
-import {Event, EventJson} from "../models/event";
+import { Event, EventJson } from "../models/event";
 import UserModule from "./user-module";
+import { User } from "../models/user";
 
 export class CalendarModule{
     file = new FileManager("database", "calendar");
@@ -12,28 +13,34 @@ export class CalendarModule{
     }
 
     getEvents(): Event[]{
-        const jsonData = this.file.getFileAsJson();
-        return jsonData.map((e: any) => {
-            const user = this.userModule.getUserById(e.creatorId);
-            e.author = user;
-            const event = Event.fromJson(e);
+        const jsonData: EventJson[] = this.file.getFileAsJson();
+
+        return jsonData.flatMap((item) => {
+            const user: User | undefined = this.userModule.getUserById(item.creatorId);
+
+            if(!user) return [];
+
+            item.author = user;
+
+            const event = Event.fromJson(item);
+
             return event;
         });
     }
 
     getEvent(eventId: number): Event | null{
-        const jsonData = this.file.getFileAsJson();
-        const event = jsonData.find((item: EventJson) => item.id === eventId);
+        const jsonData: EventJson[] = this.file.getFileAsJson();
+        const eventJson: EventJson | undefined = jsonData.find((item) => item.id === eventId);
 
-        if(!event) return null;
+        if(!eventJson) return null;
 
-        const user = this.userModule.getUserById(event.creatorId);
+        const user = this.userModule.getUserById(eventJson.creatorId);
 
         if(!user) return null;
 
-        event.author = user.toJson();    
+        eventJson.author = user;    
 
-        return event;
+        return Event.fromJson(eventJson);
     }
 
     addEvent(
@@ -45,7 +52,7 @@ export class CalendarModule{
         dateTo: string,
         locked: boolean,
     ): number{
-        const jsonData = this.file.getFileAsJson();
+        const jsonData: EventJson[] = this.file.getFileAsJson();
 
         const newId = IdGetter(jsonData);
 
@@ -62,14 +69,20 @@ export class CalendarModule{
         );
 
         jsonData.push(newEvent.toJson());
+
         this.file.saveJsonAsFile(jsonData);
+
         return newId;
     }
 
-    deleteEvent(eventId: number){
-        const jsonData = this.file.getFileAsJson();
-        const filteredData = jsonData.filter((item: any) => item.id !== eventId);
+    deleteEvent(eventId: number): boolean{
+        const jsonData: EventJson[] = this.file.getFileAsJson();
+
+        const filteredData: EventJson[] = jsonData.filter((item) => item.id !== eventId);
+
         this.file.saveJsonAsFile(filteredData);
+
+        return true;
     }
 
     updateEvent(
@@ -79,28 +92,31 @@ export class CalendarModule{
         dateFrom: string,
         dateTo: string,
         locked: boolean | null
-    ){
-        const jsonData = this.file.getFileAsJson();
-        const event = jsonData.find((json: EventJson) => json.id === eventId);
+    ): boolean{
+        const jsonData: EventJson[] = this.file.getFileAsJson();
+        
+        const eventJson: EventJson | undefined = jsonData.find((json) => json.id === eventId);
 
-        if(!event) return;
+        if(!eventJson) return false;
 
-        event.title = title;
-        event.dateFrom = dateFrom;
-        event.dateTo = dateTo;
+        eventJson.title = title;
+        eventJson.dateFrom = dateFrom;
+        eventJson.dateTo = dateTo;
 
         if(description != null){
             if(description == ''){
-                event.description = null;
+                eventJson.description = null;
             }else{
-                event.description = description;
+                eventJson.description = description;
             }
         }
 
         if(locked != null){
-            event.locked = locked;
+            eventJson.locked = locked;
         }
 
         this.file.saveJsonAsFile(jsonData);
+
+        return true;
     }
 }

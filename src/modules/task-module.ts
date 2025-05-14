@@ -1,10 +1,10 @@
 import FileManager from "../managers/file-manager";
-import {Task} from "../models/task";
+import { Task, TaskJson } from "../models/task";
 import IdGetter from "../helpers/id-getter";
-import {GroupModule} from "./group-module";
-import {Group} from "../models/group";
-import {User} from "../models/user";
-import {DateTime} from "../helpers/date-time";
+import { GroupModule } from "./group-module";
+import { Group } from "../models/group";
+import { User } from "../models/user";
+import { DateTime } from "../helpers/date-time";
 import OrganizationModule from "./organization-module";
 import UserModule from "./user-module";
 import { isOnlyWhitespace } from "../helpers/whitespace";
@@ -27,9 +27,10 @@ export class TaskModule {
         createdBy: User, 
         locked: boolean,
         commentsEnabled: boolean,
-    ): number {
-        const jsonData = this.file.getFileAsJson();
-        const newId = IdGetter(jsonData);
+    ): Task {
+        const jsonData: TaskJson[] = this.file.getFileAsJson();
+
+        const newId: number = IdGetter(jsonData);
 
         const newTask = new Task(
             newId, 

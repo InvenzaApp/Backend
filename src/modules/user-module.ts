@@ -36,7 +36,7 @@ class UserModule {
         }
     }
 
-    getUserById(id: number): User | null {
+    getUserById(id: number): User | undefined {
         const jsonData = this.file.getFileAsJson();
         const userJson = jsonData.find((user: any) => user.id === id);
 
@@ -50,7 +50,7 @@ class UserModule {
         return jsonData.filter((user: any) => idList.includes(user.id)).map((user: any) => User.fromJson(user));
     }
 
-    deleteGroupFromUsers(groupId: number): void {
+    deleteGroupFromUsers(groupId: number): boolean {
         const jsonData = this.file.getFileAsJson();
 
         const updatedUsers = jsonData.map((user: any) => {
@@ -61,6 +61,8 @@ class UserModule {
         });
 
         this.file.saveJsonAsFile(updatedUsers);
+
+        return true;
     }
 
     getUsers(): User[] {
