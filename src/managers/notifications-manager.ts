@@ -1,5 +1,7 @@
 import FileManager from '../managers/file-manager';
 import messaging from '../managers/firebase-manager';
+import { GroupJson } from '../models/group';
+import { Token, TokenJson } from '../models/token';
 import { LocaleManager } from './locale-manager';
 require('dotenv').config();
 
@@ -12,10 +14,13 @@ export class NotificationsManager{
         this.file.initializeFile();
     }
 
-    registerToken(userId: number, token: string){
-        const jsonData = this.file.getFileAsJson();
+    registerToken(
+        userId: number, 
+        token: string
+    ): boolean{
+        const jsonData: TokenJson[] = this.file.getFileAsJson();
 
-        const existingToken = jsonData.find((item: any) => item.token == token);
+        const existingToken: TokenJson | undefined = jsonData.find((item: any) => item.token == token);
 
         if(!existingToken){
             jsonData.push({
@@ -27,58 +32,90 @@ export class NotificationsManager{
         }
 
         this.file.saveJsonAsFile(jsonData);
+
+        return true;
     }
 
-    sendNotificationToUser(userId: number, messageCode: string){
-        const jsonData = this.file.getFileAsJson();
+    sendNotificationToUser(
+        userId: number, 
+        messageCode: string
+    ): boolean{
+        const jsonData: TokenJson[] = this.file.getFileAsJson();
 
-        const foundUser = jsonData.find((user: any) => user.userId === userId);
+        const tokenJson: TokenJson | undefined = jsonData.find((item) => item.userId === userId);
 
-        if(!foundUser) return;
+        if(!tokenJson) return false;
 
-        this.sendNotification(userId, messageCode, foundUser.token);
+        const token = Token.fromJson(tokenJson);
+
+        this.sendNotification(userId, messageCode, token.token);
+
+        return true;
     }
 
-    sendNotificationToUsers(userIdList: number[], messageCode: string){
-        const jsonData = this.file.getFileAsJson();
+    sendNotificationToUsers(
+        userIdList: number[], 
+        messageCode: string
+    ): boolean{
+        const jsonData: TokenJson[] = this.file.getFileAsJson();
 
-        userIdList.forEach((userId: number) => {
-            const foundUser = jsonData.find((user: any) => user.userId === userId);
+        userIdList.forEach((item) => {
+            const tokenJson: TokenJson | undefined = jsonData.find((token: any) => token.userId === item);
             
-            if(!foundUser) return;
+            if(!tokenJson) return false;
 
-            this.sendNotification(userId, messageCode, foundUser.token);
+            const token = Token.fromJson(tokenJson);
+
+            this.sendNotification(item, messageCode, token.token);
         });
+
+        return true;
     }
 
-    sendNotificationToGroup(groupId: number, messageCode: string){
-        const jsonData = this.file.getFileAsJson();
-        const jsonGroupsData = this.groupsFile.getFileAsJson();
+    sendNotificationToGroup(
+        groupId: number, 
+        messageCode: string
+    ): boolean{
+        const jsonData: TokenJson[] = this.file.getFileAsJson();
+        const jsonGroupsData: GroupJson[] = this.groupsFile.getFileAsJson();
 
-        const foundGroup = jsonGroupsData.find((group: any) => group.id === groupId);
+        const groupJson: GroupJson | undefined = jsonGroupsData.find((item) => item.id === groupId);
 
-        if(!foundGroup) return;
+        if(!groupJson) return false;
 
-        const usersIdList = foundGroup.usersIdList as number[];
+        const usersIdList = groupJson.usersIdList;
 
-        usersIdList.forEach((userId: number) => {
-            const foundUser = jsonData.find((user: any) => user.userId === userId);
+        usersIdList.forEach((item) => {
+            const tokenJson: TokenJson | undefined = jsonData.find((token) => token.userId === item);
 
-            if(!foundUser) return;
+            if(!tokenJson) return false;
 
-            this.sendNotification(userId, messageCode, foundUser.token);
+            const token: Token = Token.fromJson(tokenJson);
+
+            this.sendNotification(item, messageCode, token.token);
         });
+
+        return true;
     }
 
-    sendNotificationToGroups(groupsIdList: number[], message: string){
-        groupsIdList.forEach((groupId: number) => {
-            this.sendNotificationToGroup(groupId, message);
+    sendNotificationToGroups(
+        groupsIdList: number[], 
+        message: string
+    ): boolean {
+        groupsIdList.forEach((item) => {
+            this.sendNotificationToGroup(item, message);
         })
+
+        return true;
     }
 
-    private sendNotification(userId: number, messageCode: string, token: string){
-        const title = this.localeManager.getMessage(userId, "notification");
-        const message = this.localeManager.getMessage(userId, messageCode);
+    private sendNotification(
+        userId: number, 
+        messageCode: string, 
+        token: string
+    ){
+        const title: string = this.localeManager.getMessage(userId, "notification");
+        const message: string = this.localeManager.getMessage(userId, messageCode);
 
         const payload = {
             notification: {

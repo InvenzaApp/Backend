@@ -31,12 +31,12 @@ export class Organization {
     public locked: boolean;
 
     constructor(params: OrganizationParams) {
-        this.id = params.id,
-        this.title = params.title,
-        this.users = params.users,
-        this.admin = params.admin,
-        this.address = params.address,
-        this.locked = params.locked
+        this.id = params.id;
+        this.title = params.title;
+        this.users = params.users;
+        this.admin = params.admin;
+        this.address = params.address;
+        this.locked = params.locked;
     }
 
     static fromJson(json: OrganizationJson): Organization | null {

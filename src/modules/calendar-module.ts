@@ -16,7 +16,7 @@ export class CalendarModule{
         const jsonData: EventJson[] = this.file.getFileAsJson();
 
         return jsonData.flatMap((item) => {
-            const user: User | undefined = this.userModule.getUserById(item.creatorId);
+            const user: User | null = this.userModule.getUserById(item.creatorId);
 
             if(!user) return [];
 
@@ -51,28 +51,28 @@ export class CalendarModule{
         dateFrom: string,
         dateTo: string,
         locked: boolean,
-    ): number{
+    ): Event{
         const jsonData: EventJson[] = this.file.getFileAsJson();
 
-        const newId = IdGetter(jsonData);
+        const newId: number = IdGetter(jsonData);
 
-        const newEvent = new Event(
-            newId,
-            organizationId,
-            title,
-            description,
-            null,
-            creatorId,
-            dateFrom,
-            dateTo,
-            locked,
-        );
+        const newEvent = new Event({
+            id: newId,
+            organizationId: organizationId,
+            title: title,
+            description: description,
+            author: null,
+            creatorId: creatorId,
+            dateFrom: dateFrom,
+            dateTo: dateTo,
+            locked: locked,
+        });
 
         jsonData.push(newEvent.toJson());
 
         this.file.saveJsonAsFile(jsonData);
 
-        return newId;
+        return newEvent;
     }
 
     deleteEvent(eventId: number): boolean{

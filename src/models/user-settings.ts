@@ -1,19 +1,27 @@
+interface UserSettingsParams{
+    userId: number;
+    locale: string;
+}
+
 export type UserSettingsJson = {
     userId: number;
     locale: string;
 }
 
 export class UserSettings{
-    constructor(
-        public userId: number,
-        public locale: string,
-    ){}
+    public userId: number;
+    public locale: string;
+    
+    constructor(params: UserSettingsParams){
+        this.userId = params.userId;
+        this.locale = params.locale;
+    }
 
     static fromJson(json: UserSettingsJson): UserSettings{
-        return new UserSettings(
-            json.userId,
-            json.locale,
-        );
+        return new UserSettings({
+            userId: json.userId,
+            locale: json.locale,
+        });
     }
 
     toJson(): UserSettingsJson {

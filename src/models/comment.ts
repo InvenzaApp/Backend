@@ -27,12 +27,12 @@ export class TaskComment{
     public author: User | null;
 
     constructor(params: CommentParams){
-        this.id = params.id,
-        this.userId = params.userId,
-        this.title = params.title,
-        this.publishDate = params.publishDate,
-        this.deleted = params.deleted,
-        this.author = params.author
+        this.id = params.id;
+        this.userId = params.userId;
+        this.title = params.title;
+        this.publishDate = params.publishDate;
+        this.deleted = params.deleted;
+        this.author = params.author;
     }
 
     static fromJson(json: TaskCommentJson): TaskComment{

@@ -25,12 +25,12 @@ export class Address{
     public country: string;
 
     constructor(params: AddressParams){
-        this.street = params.street,
-        this.buildingNumber = params.buildingNumber,
-        this.apartmentNumber = params.buildingNumber,
-        this.postCode = params.postCode,
-        this.city = params.postCode,
-        this.country = params.country
+        this.street = params.street;
+        this.buildingNumber = params.buildingNumber;
+        this.apartmentNumber = params.buildingNumber;
+        this.postCode = params.postCode;
+        this.city = params.postCode;
+        this.country = params.country;
     }
 
     static fromJson(json: AddressJson): Address{

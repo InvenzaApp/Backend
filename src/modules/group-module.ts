@@ -15,35 +15,50 @@ export class GroupModule{
     getGroups(userId: number): Group[]{
         const jsonData: GroupJson[] = this.file.getFileAsJson();
 
-        return jsonData
-            .filter((group: any) => group.usersIdList.some((item: any) => item == userId))
-            .map((group: any) => Group.fromJson(group));
+        const filteredData: GroupJson[] = jsonData.filter((groupJson) => {
+            return groupJson.usersIdList.some((item) => item === userId);
+        });
+
+        const groupsList: Group[] = filteredData.flatMap((item) => {
+            const group = Group.fromJson(item);
+
+            if(!group) return [];
+
+            const usersList: User[] = this.userModule.getUsersById(group.usersIdList);
+
+            group.usersList = usersList;
+
+            return group;
+        });
+
+        return groupsList;
+            
     }
 
     addGroup(
-        name: string, 
+        title: string, 
         usersIdList: number[], 
         locked: boolean
-    ): Group {
-        const jsonData = this.file.getFileAsJson();
+    ): Group | null {
+        const jsonData: GroupJson[] = this.file.getFileAsJson();
 
-        const newId = IdGetter(jsonData);
+        const newId: number = IdGetter(jsonData);
 
-        const newGroup = new Group(
-            newId,
-            name,
-            usersIdList,
-            null,
-            locked
-        );
+        const newGroup = new Group({
+            id: newId,
+            title: title,
+            usersIdList: usersIdList,
+            usersList: null,
+            locked: locked,
+        });
 
         jsonData.push(newGroup.toJson());
 
-        this.userModule.addGroupToUsers(newId, usersIdList);
+        const success = this.userModule.addGroupToUsers(newId, usersIdList);
 
         this.file.saveJsonAsFile(jsonData);
 
-        return newGroup;
+        return success ? newGroup : null;
     }
 
     getGroup(id: number): Group | null {
@@ -54,6 +69,8 @@ export class GroupModule{
         if(!groupJson) return null;
 
         const group = Group.fromJson(groupJson);
+
+        if(!group) return null;
 
         const tmpList: User[] = [];
 
@@ -159,6 +176,8 @@ export class GroupModule{
 
         const group = Group.fromJson(groupJson);
 
+        if(!group) return null;
+
         return group.title;
     }
 
@@ -172,7 +191,7 @@ export class GroupModule{
 
             const group = Group.fromJson(groupJson);
 
-            group.usersIdList.push(userId);
+            if(group) group.usersIdList.push(userId);
         });
 
         this.file.saveJsonAsFile(jsonData);

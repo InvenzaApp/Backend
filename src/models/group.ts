@@ -1,5 +1,5 @@
-import { User, UserJson } from "./user";
 import UserModule from "../modules/user-module";
+import { User, UserJson } from "./user";
 
 interface GroupParams{
     id: number;
@@ -17,33 +17,28 @@ export type GroupJson = {
     locked: boolean;
 }
 
-const userModule = new UserModule();
-
 export class Group{
     public id: number;
     public title: string;
     public usersIdList: number[];
     public usersList: User[] | null;
     public locked: boolean;
+    userModule = new UserModule();
 
     constructor(params: GroupParams) {
-        this.id = params.id,
-        this.title = params.title,
-        this.usersIdList = params.usersIdList,
-        this.usersList = params.usersList,
-        this.locked = params.locked
+        this.id = params.id;
+        this.title = params.title;
+        this.usersIdList = params.usersIdList;
+        this.usersList = params.usersList;
+        this.locked = params.locked;
     }
 
-    static fromJson(json: GroupJson): Group | null {
-        const usersList: User[] | undefined = userModule.getUsersById(json.usersIdList);
-
-        if(!usersList) return null;
-
+    static fromJson(json: GroupJson) {
         return new Group({
             id: json.id,
             title: json.title,
             usersIdList: json.usersIdList,
-            usersList: usersList,
+            usersList: null,
             locked: json.locked,
         });
     }

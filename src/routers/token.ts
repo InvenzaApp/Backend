@@ -11,7 +11,7 @@ const tokenManager = new TokenManager();
 
 router.post('/', authMiddleware, (req, res) => {
     const { userId } = (req as any).user;
-    const requestToken = tokenManager.getAccessToken(userId);
+    const requestToken: string = tokenManager.getAccessToken(userId);
     
     const { token } = req.body;
 
@@ -20,9 +20,13 @@ router.post('/', authMiddleware, (req, res) => {
         return;
     }
 
-    notifications.registerToken(userId, token);
+    const success = notifications.registerToken(userId, token);
 
-    performSuccessResponse(res, null, requestToken);
+    if(!success){
+        performFailureResponse(res, INVALID_REQUEST_PARAMETERS);
+    }else{
+        performSuccessResponse(res, null, requestToken);
+    }
 });
 
 export default router;

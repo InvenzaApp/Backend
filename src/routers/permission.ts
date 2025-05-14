@@ -9,7 +9,7 @@ const tokenManager = new TokenManager();
 
 router.get('/', authMiddleware, (req, res) => {
     const { userId } = (req as any).user;
-    const token = tokenManager.getAccessToken(userId);
+    const token: string = tokenManager.getAccessToken(userId);
 
     performSuccessResponse(res, permissionsList, token);
 });

@@ -35,18 +35,16 @@ export class Event{
     public dateTo: string;
     public locked: boolean;
 
-    constructor(
-        params: EventParams
-    ){
-        this.id = params.id,
-        this.organizationId = params.organizationId,
-        this.title = params.title,
-        this.description = params.description,
-        this.author = params.author,
-        this.creatorId = params.creatorId,
-        this.dateFrom = params.dateFrom,
-        this.dateTo = params.dateTo,
-        this.locked = params.locked
+    constructor(params: EventParams){
+        this.id = params.id;
+        this.organizationId = params.organizationId;
+        this.title = params.title;
+        this.description = params.description;
+        this.author = params.author;
+        this.creatorId = params.creatorId;
+        this.dateFrom = params.dateFrom;
+        this.dateTo = params.dateTo;
+        this.locked = params.locked;
     }
 
     static fromJson(json: EventJson): Event{
