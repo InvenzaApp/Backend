@@ -5,6 +5,7 @@ import organizationRouter from './routers/organization';
 import groupsRouter from './routers/group';
 import tokenRouter from './routers/token';
 import commentsRouter from './routers/comments';
+import calendarRouter from './routers/calendar';
 import permissionRouter from './routers/permission';
 import UserModule from './modules/user-module';
 import OrganizationModule from "./modules/organization-module";
@@ -32,6 +33,7 @@ app.use('/api/groups', groupsRouter);
 app.use('/api/permissions', permissionRouter);
 app.use('/api/token', tokenRouter);
 app.use('/api/comments', commentsRouter);
+app.use('/api/calendar', calendarRouter);
 
 const initialize = () => {
    new SettingsModule();
