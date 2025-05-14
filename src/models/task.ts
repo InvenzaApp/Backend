@@ -3,6 +3,7 @@ import UserModule from "../modules/user-module";
 import { TaskComment, TaskCommentJson } from "./comment";
 import { Group, GroupJson } from "./group";
 import { GroupModule } from "../modules/group-module";
+import { ItemEntity } from "../core/item-entity";
 
 interface TaskParams{
     id: number;
@@ -37,9 +38,7 @@ export type TaskJson = {
 const userModule = new UserModule();
 const groupModule = new GroupModule();
 
-export class Task{
-    public id: number;
-    public title: string;
+export class Task extends ItemEntity{
     public description: string | null;
     public deadline: string | null;
     public groupsIdList: number[];
@@ -47,11 +46,11 @@ export class Task{
     public createdAt: string;
     public createdBy: User;
     public status: string;
-    public locked: boolean;
     public comments: TaskComment[];
     public commentsEnabled: boolean;
 
     constructor(params: TaskParams) {
+        super(params.id, params.title, params.locked);
         this.id = params.id;
         this.title = params.title;
         this.description = params.description;

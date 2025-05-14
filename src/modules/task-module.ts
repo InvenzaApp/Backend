@@ -10,14 +10,41 @@ import UserModule from "./user-module";
 import { isOnlyWhitespace } from "../helpers/whitespace";
 import { TaskComment, TaskCommentJson } from "../models/comment";
 import { Organization } from "../models/organization";
+import { CockpitRepository } from "../core/repository/cockpit-repository";
 
-export class TaskModule {
+export class TaskModule extends CockpitRepository<Task>{
+    get(resourceId: number): Task | null {
+        const jsonData: TaskJson[] = this.file.getFileAsJson();
+        const taskJson: TaskJson | undefined = jsonData.find((item) => item.id === resourceId);
+        
+        if(!taskJson) return null;
+
+        const task: Task | null = Task.fromJson(taskJson);
+
+        if(!task) return null;
+
+        const groupsIdList: number[] = task.groupsIdList;
+
+        let tmpList: Group[] = [];
+
+        groupsIdList.forEach((item) => {
+            const group = this.groupModule.getGroup(item);
+
+            if(group) tmpList.push(group);
+        })
+
+        task.groupsList = tmpList;
+
+        return task;
+    }
+
     file = new FileManager("database", "tasks");
     groupModule = new GroupModule();
     organizationModule = new OrganizationModule();
     userModule = new UserModule();
 
     constructor() {
+        super();
         this.file.initializeFile();
     }
 
@@ -47,7 +74,7 @@ export class TaskModule {
             locked: locked ?? false,
             comments: [],
             commentsEnabled: commentsEnabled,
-        });
+        })
 
         if(description == null || isOnlyWhitespace(description)){
             newTask.description = null;
