@@ -1,6 +1,6 @@
 import { User } from "../../user/models/user";
 import { UserRepository } from "../../user/repository/user-repository";
-import { Address, AddressJson } from "../../address/models/address";
+import { Address } from "../../address/models/address";
 import { ItemEntity } from "../../../core/item-enitity/item-entity";
 import { OrganizationCreatePayload } from "../payload/organization-create-payload";
 import { OrganizationJson } from "./organization-json";

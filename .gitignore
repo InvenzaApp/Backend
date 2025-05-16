@@ -5,3 +5,4 @@
 src/database
 src/cert/
 fcmServiceAccountKey.json
+dist/
