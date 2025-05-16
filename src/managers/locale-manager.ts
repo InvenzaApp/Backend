@@ -1,4 +1,5 @@
-import { UserSettings, UserSettingsJson } from "../models/user-settings";
+import { UserSettings } from "../features/settings/models/user-settings";
+import { UserSettingsJson } from "../features/settings/models/user-settings-json";
 import FileManager from "./file-manager";
 import fs from 'fs';
 

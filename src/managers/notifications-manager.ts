@@ -1,8 +1,9 @@
 import FileManager from '../managers/file-manager';
 import messaging from '../managers/firebase-manager';
-import { GroupJson } from '../models/group';
-import { Token, TokenJson } from '../models/token';
+import { Token} from '../features/token/models/token';
 import { LocaleManager } from './locale-manager';
+import { TokenJson } from '../features/token/models/token-json';
+import { GroupJson } from '../features/group/models/group-json';
 require('dotenv').config();
 
 export class NotificationsManager{
