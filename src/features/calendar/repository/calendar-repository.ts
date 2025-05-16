@@ -7,16 +7,19 @@ import { EventJson } from "../models/event-json";
 import IdGetter from "../../../helpers/id-getter";
 import { EventCreatePayload } from "../payload/event-create-payload";
 import { EventUpdatePayload } from "../payload/event-update-payload";
+import { OrganizationRepository } from "../../organization/repository/organization-repository";
 
 export class CalendarRepository extends CockpitRepository<Event> {
     file: FileManager;
     private userRepository: UserRepository;
+    private organizationRepository: OrganizationRepository;
 
     constructor() {
         super();
         this.file = new FileManager("database", "calendar");
         this.file.initializeFile();
         this.userRepository = new UserRepository();
+        this.organizationRepository = new OrganizationRepository();
     }
 
     add(payload: EventCreatePayload): Event | null {
@@ -61,7 +64,15 @@ export class CalendarRepository extends CockpitRepository<Event> {
     getAll(resourceId: number): Event[] | null {
         const jsonData: EventJson[] = this.file.getFileAsJson();
 
-        return jsonData.flatMap((item) => {
+        const organization = this.organizationRepository.getOrganizationByUserId(resourceId);
+
+        if(organization == null) return null;
+
+        const filteredData = jsonData.filter((item) => item.organizationId === organization.id);
+
+        if(filteredData == null) return null;
+
+        return filteredData.flatMap((item) => {
             const user: User | null = this.userRepository.get(item.creatorId);
 
             if (!user) return [];
