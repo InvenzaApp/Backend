@@ -27,7 +27,16 @@ To initialize project just run this command in terminal:
 npm i
 ```
 
-When you initialize project, you can start server with command:
+If you want to start server in development mode, run the commend:
 ```
 npm run dev
+```
+
+If you want to start server on server, you have to build with:
+```
+npm run build
+```
+Then, start server with:
+```
+npm run start
 ```

@@ -2,10 +2,10 @@ import {NextFunction, Request as ExpressRequest, Response as ExpressResponse} fr
 import {performFailureResponse} from "../helpers/responses";
 import {UNAUTHORIZED_ACCESS} from "../helpers/response-codes";
 import jwt from "jsonwebtoken";
-import { SettingsModule } from "../modules/settings-module";
+import { SettingsRepository } from "../features/settings/repository/settings-repository";
 
 require('dotenv').config();
-const settings = new SettingsModule();
+const settings = new SettingsRepository();
 
 export const authMiddleware = (req: ExpressRequest, res: ExpressResponse, next: NextFunction) => {
     const headers = req.headers['authorization'];

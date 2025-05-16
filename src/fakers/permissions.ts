@@ -16,6 +16,11 @@ export const adminPermissions = [
   "delete_task",
   "show_organization",
   "update_organization",
+  "add_calendar",
+  "list_calendar",
+  "show_calendar",
+  "update_calendar",
+  "delete_calendar",
   "other_account_show",
   "other_account_update"
 ];
