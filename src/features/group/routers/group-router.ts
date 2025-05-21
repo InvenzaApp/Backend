@@ -38,8 +38,8 @@ export class GroupRouter extends RouterRepository<Group>{
     }
 
     get(req: Request, res: Response): void {
-        const { userId } = (req as any).user;
-        const token: string = this.tokenManager.getAccessToken(userId);
+        const { userId, organizationId } = (req as any).user;
+        const token: string = this.tokenManager.getAccessToken(userId, organizationId);
         const groupId = Number(req.params.id);
 
         const group: Group | null = this.repository.get(groupId);
@@ -53,8 +53,8 @@ export class GroupRouter extends RouterRepository<Group>{
     }
 
     getAll(req: Request, res: Response): void {
-        const { userId } = (req as any).user;
-        const token: string = this.tokenManager.getAccessToken(userId);
+        const { userId, organizationId } = (req as any).user;
+        const token: string = this.tokenManager.getAccessToken(userId, organizationId);
 
         const groupsList: Group[] | null = this.repository.getAll(userId);
 
@@ -67,8 +67,8 @@ export class GroupRouter extends RouterRepository<Group>{
 
     post(req: Request, res: Response): void {
         const { name, usersIdList, locked } = req.body;
-        const { userId } = (req as any).user;
-        const token: string = this.tokenManager.getAccessToken(userId);
+        const { userId, organizationId } = (req as any).user;
+        const token: string = this.tokenManager.getAccessToken(userId, organizationId);
 
         if(!name || !usersIdList){
         performFailureResponse(res, INVALID_REQUEST_PARAMETERS)
@@ -93,8 +93,8 @@ export class GroupRouter extends RouterRepository<Group>{
 
     put(req: Request, res: Response): void {
         const { name, usersIdList, locked } = req.body;
-        const { userId } = (req as any).user;
-        const token: string = this.tokenManager.getAccessToken(userId);
+        const { userId, organizationId } = (req as any).user;
+        const token: string = this.tokenManager.getAccessToken(userId, organizationId);
 
         const groupRepository = new GroupRepository();
 
@@ -138,8 +138,8 @@ export class GroupRouter extends RouterRepository<Group>{
     }
 
     delete(req: Request, res: Response): void {
-        const { userId } = (req as any).user;
-        const token: string = this.tokenManager.getAccessToken(userId);
+        const { userId, organizationId } = (req as any).user;
+        const token: string = this.tokenManager.getAccessToken(userId, organizationId);
         const groupId = Number(req.params.id);
 
         this.notificationsManager.sendNotificationToGroup(groupId, "group_deleted");

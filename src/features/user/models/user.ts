@@ -9,7 +9,7 @@ export class User{
     public title: string;
     public email: string;
     public password: string;
-    public organizationId: number;
+    public organizationsIdList: number[];
     public groupsIdList: number[];
     public groups: Group[] | null;
     public permissions: string[];
@@ -23,7 +23,7 @@ export class User{
         this.title = params.title;
         this.email = params.email;
         this.password = params.password;
-        this.organizationId = params.organizationId;
+        this.organizationsIdList = params.organizationsIdList;
         this.groupsIdList = params.groupsIdList;
         this.groups = params.groups;
         this.permissions = params.permissions;
@@ -39,7 +39,7 @@ export class User{
             title: json.title,
             email: json.email,
             password: json.password,
-            organizationId: json.organizationId,
+            organizationsIdList: json.organizationsIdList,
             groupsIdList: json.groupsIdList,
             groups: null,
             permissions: json.permissions,
@@ -58,7 +58,7 @@ export class User{
             title: this.title,
             email: this.email,
             password: this.password,
-            organizationId: this.organizationId,
+            organizationsIdList: this.organizationsIdList,
             groupsIdList: this.groupsIdList,
             groups: groupsJson,
             permissions: this.permissions,

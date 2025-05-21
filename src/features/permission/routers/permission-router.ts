@@ -22,8 +22,8 @@ export class PermissionRouter{
     }
 
     get(req: ExpressRequest, res: ExpressResponse){
-        const { userId } = (req as any).user;
-        const token: string = this.tokenManager.getAccessToken(userId);
+        const { userId, organizationId } = (req as any).user;
+        const token: string = this.tokenManager.getAccessToken(userId, organizationId);
 
         performSuccessResponse(res, permissionsList, token);
     }

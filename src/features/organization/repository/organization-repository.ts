@@ -37,7 +37,18 @@ export class OrganizationRepository extends CockpitRepository<Organization> {
     }
 
     getAll(resourceId: number): Organization[] | null {
-        throw new Error("Method not implemented.");
+        const jsonData: OrganizationJson[] = this.file.getFileAsJson();
+        const filteredData: OrganizationJson[] | null = jsonData.filter((org) => org.usersIdList.includes(resourceId));
+
+        if(filteredData == null) return null;
+
+        return filteredData.flatMap((item) => {
+            const organization = Organization.fromJson(item);
+
+            if(organization == null) return [];
+
+            return organization;
+        });
     }
 
     update(payload: OrganizationUpdatePayload): number | null {

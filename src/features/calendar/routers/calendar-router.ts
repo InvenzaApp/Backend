@@ -33,8 +33,8 @@ export class CalendarRouter extends RouterRepository<Event>{
     }
 
     get(req: Request, res: Response): void {
-        const { userId } = (req as any).user;
-        const token: string = this.tokenManager.getAccessToken(userId);
+        const { userId, organizationId } = (req as any).user;
+        const token: string = this.tokenManager.getAccessToken(userId, organizationId);
         const resourceId = Number(req.params.id);
 
         const event: Event | null = this.repository.get(resourceId);
@@ -47,8 +47,8 @@ export class CalendarRouter extends RouterRepository<Event>{
     }
     
     getAll(req: Request, res: Response): void {
-        const { userId } = (req as any).user;
-        const token: string = this.tokenManager.getAccessToken(userId);
+        const { userId, organizationId } = (req as any).user;
+        const token: string = this.tokenManager.getAccessToken(userId, organizationId);
 
         const events: Event[] | null = this.repository.getAll(userId);
 
@@ -60,8 +60,8 @@ export class CalendarRouter extends RouterRepository<Event>{
     }
     
     post(req: Request, res: Response): void {
-        const { userId } = (req as any).user;
-        const token: string = this.tokenManager.getAccessToken(userId);
+        const { userId, organizationId } = (req as any).user;
+        const token: string = this.tokenManager.getAccessToken(userId, organizationId);
 
         const { title, description, dateFrom, dateTo, locked } = req.body;
 
@@ -95,8 +95,8 @@ export class CalendarRouter extends RouterRepository<Event>{
     }
     
     put(req: Request, res: Response): void {
-        const { userId } = (req as any).user;
-        const token: string = this.tokenManager.getAccessToken(userId);
+        const { userId, organizationId } = (req as any).user;
+        const token: string = this.tokenManager.getAccessToken(userId, organizationId);
         const resourceId = Number(req.params.id);
 
         const { title, description, dateFrom, dateTo, locked } = req.body;
@@ -123,8 +123,8 @@ export class CalendarRouter extends RouterRepository<Event>{
     }
     
     delete(req: Request, res: Response): void {
-        const { userId } = (req as any).user;
-        const token: string = this.tokenManager.getAccessToken(userId);
+        const { userId, organizationId } = (req as any).user;
+        const token: string = this.tokenManager.getAccessToken(userId, organizationId);
         const resourceId = Number(req.params.id);
 
         const success: boolean = this.repository.delete(resourceId);
