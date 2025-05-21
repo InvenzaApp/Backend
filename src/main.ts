@@ -36,12 +36,16 @@ import fs from "fs";
 import * as https from "node:https";
 import * as http from "node:http";
 import path from "path";
+import cors from "cors";
+import cmsRouter from './features/cms/routers/cms-router';
 
 require('dotenv').config();
 
 const app = express();
 const port = process.env.SERVER_PORT || 3000;
 const isDebug = process.env.DEBUG == "true";
+
+app.use(cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -54,6 +58,11 @@ app.use('/api/permissions', permissionRouter);
 app.use('/api/token', tokenRouter);
 app.use('/api/comments', commentsRouter);
 app.use('/api/calendar', calendarRouter);
+app.use('/api/cms', cmsRouter);
+
+app.get('/', (req, res) => {
+   res.status(200).send({'success': true});
+})
 
 if(isDebug){
    http.createServer(app).listen(port, () => {
