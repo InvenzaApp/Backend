@@ -5,6 +5,7 @@ import { INVALID_REQUEST_PARAMETERS } from "../../../helpers/response-codes";
 import { NotificationsManager } from "../../../managers/notifications-manager";
 import { TokenManager } from "../../../managers/token-manager";
 import { Request as ExpressRequest, Response as ExpressResponse } from "express";
+import { organizationMiddleware } from "../../../authorization/organization_authorization";
 
 export class TokenRouter{
     router: Router;
@@ -20,12 +21,12 @@ export class TokenRouter{
     }
 
     private initializeRoutes(){
-        this.router.post('/', authMiddleware, this.post.bind(this));
+        this.router.post('/', organizationMiddleware, this.post.bind(this));
     }
 
     post(req: ExpressRequest, res: ExpressResponse){
         const { userId } = (req as any).user;
-        const requestToken: string = this.tokenManager.getAccessToken(userId);
+        const requestToken: string = this.tokenManager.getOrganizationToken(userId);
         
         const { token } = req.body;
 

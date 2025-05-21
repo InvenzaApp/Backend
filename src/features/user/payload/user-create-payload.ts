@@ -8,7 +8,7 @@ export interface UserCreatePayload extends CreatePayload{
     title: string;
     email: string;
     password: string;
-    organizationId: number;
+    organizationsIdList: number[];
     groupsIdList: number[];
     groups: Group[] | null;
     permissions: string[];

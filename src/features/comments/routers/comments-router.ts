@@ -40,8 +40,8 @@ export class CommentsRouter extends RouterRepository<TaskComment>{
     }
 
     getAll(req: Request, res: Response): void {
-        const { userId } = (req as any).user;
-        const token: string = this.tokenManager.getAccessToken(userId);
+        const { userId, organizationId } = (req as any).user;
+        const token: string = this.tokenManager.getAccessToken(userId, organizationId);
 
         const { taskId } = req.body;
 
@@ -72,8 +72,8 @@ export class CommentsRouter extends RouterRepository<TaskComment>{
     }
 
     post(req: Request, res: Response): void {
-        const { userId } = (req as any).user;
-        const token: string = this.tokenManager.getAccessToken(userId);
+        const { userId, organizationId } = (req as any).user;
+        const token: string = this.tokenManager.getAccessToken(userId, organizationId);
 
         const { taskId, title } = req.body;
 
@@ -110,8 +110,8 @@ export class CommentsRouter extends RouterRepository<TaskComment>{
     }
 
     delete(req: Request, res: Response): void {
-        const { userId } = (req as any).user;
-        const token: string = this.tokenManager.getAccessToken(userId);
+        const { userId, organizationId } = (req as any).user;
+        const token: string = this.tokenManager.getAccessToken(userId, organizationId);
 
         const resourceId = Number(req.params.id);
 

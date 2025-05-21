@@ -12,7 +12,7 @@ export const adminFaker = new User({
     title: "Administrator Developer", 
     email: "admin@invenza.pl", 
     password: hashPassword(defaultUserPassword), 
-    organizationId: 0, 
+    organizationsIdList: [0], 
     groupsIdList: [0],
     groups: null,
     permissions: adminPermissions,

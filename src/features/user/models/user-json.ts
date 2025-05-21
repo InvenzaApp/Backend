@@ -7,7 +7,7 @@ export type UserJson = {
     title: string;
     email: string;
     password: string;
-    organizationId: number;
+    organizationsIdList: number[];
     groupsIdList: number[];
     groups: GroupJson[] | null;
     permissions: string[];
