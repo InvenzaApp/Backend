@@ -39,7 +39,7 @@ export class UserRepository extends CockpitRepository<User> {
             title: `${payload.name} ${payload.lastname}`,
             email: payload.email,
             password: hashPassword(payload.password),
-            organizationId: payload.organizationId,
+            organizationsIdList: payload.organizationsIdList,
             groupsIdList: payload.groupsIdList ?? [],
             groups: null,
             permissions: payload.permissions ?? [],
@@ -67,7 +67,9 @@ export class UserRepository extends CockpitRepository<User> {
     getAll(resourceId: number): User[] | null {
         const jsonData: UserJson[] = this.file.getFileAsJson();
 
-        return jsonData.map((user) => User.fromJson(user));
+        const filteredData: UserJson[] | null = jsonData.filter((item) => item.organizationsIdList.includes(resourceId));
+
+        return filteredData.map((user) => User.fromJson(user));
     }
 
     update(payload: UserUpdatePayload): number | null {
@@ -75,7 +77,8 @@ export class UserRepository extends CockpitRepository<User> {
         const userJson: UserJson | undefined = jsonData.find((item) => item.id === payload.userId);
 
         if (!userJson) return null;
-
+        
+        userJson.organizationsIdList = payload.organizationsIdList;
         userJson.name = payload.name;
         userJson.lastname = payload.lastname;
         userJson.title = `${payload.name} ${payload.lastname}`;

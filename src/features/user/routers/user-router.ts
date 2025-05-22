@@ -11,6 +11,7 @@ import { Organization } from "../../organization/models/organization";
 import { authMiddleware } from "../../../authorization/api_authorization";
 import { OrganizationRepository } from "../../organization/repository/organization-repository";
 import { SettingsRepository } from "../../settings/repository/settings-repository";
+import { organizationMiddleware } from "../../../authorization/organization_authorization";
 require("dotenv").config();
 
 export class UserRouter extends RouterRepository<User> {
@@ -47,8 +48,8 @@ export class UserRouter extends RouterRepository<User> {
 
     get(req: Request, res: Response): void {
         const resourceId = Number(req.params.id);
-        const { userId } = (req as any).user;
-        const token: string = this.tokenManager.getAccessToken(userId);
+        const { userId, organizationId } = (req as any).user;
+        const token: string = this.tokenManager.getAccessToken(userId, organizationId);
 
         const user: User | null = this.repository.get(resourceId);
         const groups: Group[] | null = this.groupRepository.getAll(resourceId);
@@ -64,10 +65,10 @@ export class UserRouter extends RouterRepository<User> {
     }
 
     getAll(req: Request, res: Response): void {
-        const { userId } = (req as any).user;
-        const token: string = this.tokenManager.getAccessToken(userId);
+        const { userId, organizationId } = (req as any).user;
+        const token: string = this.tokenManager.getAccessToken(userId, organizationId);
 
-        const usersList: User[] | null = this.repository.getAll(userId);
+        const usersList: User[] | null = this.repository.getAll(organizationId);
 
         if (usersList == null) {
             performFailureResponse(res, INVALID_REQUEST_PARAMETERS);
@@ -77,12 +78,12 @@ export class UserRouter extends RouterRepository<User> {
     }
 
     post(req: Request, res: Response): void {
-        const { userId } = (req as any).user;
-        const token: string = this.tokenManager.getAccessToken(userId);
+        const { userId, organizationId } = (req as any).user;
+        const token: string = this.tokenManager.getAccessToken(userId, organizationId);
 
-        const { name, lastname, email, password, groupsIdList, permissions, admin, locked } = req.body;
+        const { name, lastname, email, password, groupsIdList, organizationsIdList, permissions, admin, locked } = req.body;
 
-        if (!name || !lastname || !email || !password) {
+        if (!name || !lastname || !email || !password || !organizationsIdList) {
             performFailureResponse(res, INVALID_CREDENTIALS);
             return;
         }
@@ -95,7 +96,7 @@ export class UserRouter extends RouterRepository<User> {
         }
 
         const data: User | null = this.repository.add({
-            organizationId: organization.id,
+            organizationsIdList: organizationsIdList,
             name: name,
             lastname: lastname,
             email: email,
@@ -111,7 +112,7 @@ export class UserRouter extends RouterRepository<User> {
             return;
         }
 
-        const organizationSuccess: boolean = this.organizationRepository.addUser(organization.id, data);
+        const organizationSuccess: boolean = this.organizationRepository.addUser(organizationsIdList, data);
 
         if (!organizationSuccess) {
             performFailureResponse(res, INVALID_REQUEST_PARAMETERS);
@@ -129,10 +130,10 @@ export class UserRouter extends RouterRepository<User> {
     }
 
     put(req: Request, res: Response): void {
-        const { userId } = (req as any).user;
-        const token: string = this.tokenManager.getAccessToken(userId);
+        const { userId, organizationId } = (req as any).user;
+        const token: string = this.tokenManager.getAccessToken(userId, organizationId);
         const resourceId = Number(req.params.id);
-        const { name, lastname, email, groupsIdList, permissions, admin, locked } = req.body;
+        const { name, lastname, email, groupsIdList, organizationsIdList, permissions, admin, locked } = req.body;
 
         if (!name || !lastname || !email) {
             performFailureResponse(res, INVALID_CREDENTIALS);
@@ -141,6 +142,7 @@ export class UserRouter extends RouterRepository<User> {
 
         const userSuccess: number | null = this.repository.update({
             userId: resourceId,
+            organizationsIdList: organizationsIdList,
             name: name,
             lastname: lastname,
             email: email,
@@ -162,12 +164,19 @@ export class UserRouter extends RouterRepository<User> {
             return;
         }
 
+        const organizationSuccess: boolean = this.organizationRepository.updateUser(organizationsIdList, resourceId);
+
+        if(!organizationSuccess){
+            performFailureResponse(res, INVALID_REQUEST_PARAMETERS);
+            return;
+        }
+
         performSuccessResponse(res, resourceId, token);
     }
 
     delete(req: Request, res: Response): void {
-        const { userId } = (req as any).user;
-        const token: string = this.tokenManager.getAccessToken(userId);
+        const { userId, organizationId } = (req as any).user;
+        const token: string = this.tokenManager.getAccessToken(userId, organizationId);
 
         const resourceId = Number(req.params.id);
 
@@ -217,7 +226,7 @@ export class UserRouter extends RouterRepository<User> {
 
         user.groups = groupsList;
 
-        const token: string = this.tokenManager.getAccessToken(user.id);
+        const token: string = this.tokenManager.getOrganizationToken(user.id);
         const success = this.settingsRepository.changeLanguage(user.id, locale);
 
         if (!success) {
@@ -228,8 +237,8 @@ export class UserRouter extends RouterRepository<User> {
     }
 
     updatePassword(req: Request, res: Response): void{
-        const { userId } = (req as any).user;
-        const token: string = this.tokenManager.getAccessToken(userId);
+        const { userId, organizationId } = (req as any).user;
+        const token: string = this.tokenManager.getAccessToken(userId, organizationId);
 
         const { oldPassword, newPassword } = req.body;
 
@@ -244,8 +253,8 @@ export class UserRouter extends RouterRepository<User> {
     }
 
     updateUser(req: Request, res: Response): void{
-        const { userId } = (req as any).user;
-        const token: string = this.tokenManager.getAccessToken(userId);
+        const { userId, organizationId } = (req as any).user;
+        const token: string = this.tokenManager.getAccessToken(userId, organizationId);
 
         const { name, lastname, email } = req.body;
 
@@ -264,8 +273,8 @@ export class UserRouter extends RouterRepository<User> {
     }
 
     getUser(req: Request, res: Response): void{
-        const { userId } = (req as any).user;
-        const token: string = this.tokenManager.getAccessToken(userId);
+        const { userId, organizationId } = (req as any).user;
+        const token: string = this.tokenManager.getAccessToken(userId, organizationId);
 
         const resourceId = Number(req.params.id);
 

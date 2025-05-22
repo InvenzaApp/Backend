@@ -5,6 +5,7 @@ export interface UserUpdatePayload extends UpdatePayload {
     name: string;
     lastname: string;
     email: string;
+    organizationsIdList: number[];
     groupsIdList: number[] | null;
     permissions: string[] | null;
     admin: boolean | null;

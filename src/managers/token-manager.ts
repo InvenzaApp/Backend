@@ -9,7 +9,11 @@ export class TokenManager {
         this.apiKey = process.env.API_TOKEN as string;
     }
 
-    getAccessToken(userId: number) {
+    getOrganizationToken(userId: number){
         return jwt.sign({'userId': userId}, this.apiKey);
+    }
+
+    getAccessToken(userId: number, organizationId: number) {
+        return jwt.sign({'userId': userId, 'organizationId': organizationId}, this.apiKey);
     }
 }

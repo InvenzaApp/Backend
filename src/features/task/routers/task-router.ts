@@ -37,8 +37,8 @@ export class TaskRouter extends RouterRepository<Task>{
 
     get(req: Request, res: Response): void {
         const resourceId = Number(req.params.id);
-        const { userId } = (req as any).user;
-        const token: string = this.tokenManager.getAccessToken(userId);
+        const { userId, organizationId } = (req as any).user;
+        const token: string = this.tokenManager.getAccessToken(userId, organizationId);
 
         const task: Task | null = this.repository.get(resourceId);
 
@@ -50,8 +50,8 @@ export class TaskRouter extends RouterRepository<Task>{
     }
     
     getAll(req: Request, res: Response): void {
-        const { userId } = (req as any).user;
-        const token: string = this.tokenManager.getAccessToken(userId);
+        const { userId, organizationId } = (req as any).user;
+        const token: string = this.tokenManager.getAccessToken(userId, organizationId);
 
         const tasks: Task[] | null = this.repository.getAll(userId);
 
@@ -64,8 +64,8 @@ export class TaskRouter extends RouterRepository<Task>{
 
     post(req: Request, res: Response): void {
         const { title, description, deadline, groupsIdList, locked, commentsEnabled } = req.body;
-        const { userId } = (req as any).user;
-        const token: string = this.tokenManager.getAccessToken(userId);
+        const { userId, organizationId } = (req as any).user;
+        const token: string = this.tokenManager.getAccessToken(userId, organizationId);
 
         if(!title || !groupsIdList){
             performFailureResponse(res, INVALID_REQUEST_PARAMETERS);
@@ -102,8 +102,8 @@ export class TaskRouter extends RouterRepository<Task>{
     put(req: Request, res: Response): void {
         const id = Number(req.params.id);
         const { title, description, deadline, groupsIdList, status, locked, commentsEnabled } = req.body;
-        const { userId } = (req as any).user;
-        const token: string = this.tokenManager.getAccessToken(userId);
+        const { userId, organizationId } = (req as any).user;
+        const token: string = this.tokenManager.getAccessToken(userId, organizationId);
 
         if(!title || !groupsIdList){
             performFailureResponse(res, INVALID_REQUEST_PARAMETERS);
@@ -146,8 +146,8 @@ export class TaskRouter extends RouterRepository<Task>{
 
     delete(req: Request, res: Response): void {
         const resourceId = Number(req.params.id);
-        const { userId } = (req as any).user;
-        const token: string = this.tokenManager.getAccessToken(userId);
+        const { userId, organizationId } = (req as any).user;
+        const token: string = this.tokenManager.getAccessToken(userId, organizationId);
 
         const task: Task | null = this.repository.get(resourceId);
 
