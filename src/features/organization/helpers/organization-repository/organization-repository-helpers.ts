@@ -13,8 +13,13 @@ declare module "../../repository/organization-repository" {
         ): Organization | null;
 
         addUser(
-            organizationId: number,
+            organizationsIdList: number[],
             user: User
+        ): boolean;
+
+        updateUser(
+            organizationsIdList: number[],
+            userId: number
         ): boolean;
 
         deleteUser(

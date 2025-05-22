@@ -81,9 +81,9 @@ export class UserRouter extends RouterRepository<User> {
         const { userId, organizationId } = (req as any).user;
         const token: string = this.tokenManager.getAccessToken(userId, organizationId);
 
-        const { name, lastname, email, password, groupsIdList, permissions, admin, locked } = req.body;
+        const { name, lastname, email, password, groupsIdList, organizationsIdList, permissions, admin, locked } = req.body;
 
-        if (!name || !lastname || !email || !password) {
+        if (!name || !lastname || !email || !password || !organizationsIdList) {
             performFailureResponse(res, INVALID_CREDENTIALS);
             return;
         }
@@ -96,7 +96,7 @@ export class UserRouter extends RouterRepository<User> {
         }
 
         const data: User | null = this.repository.add({
-            organizationsIdList: [organization.id],
+            organizationsIdList: organizationsIdList,
             name: name,
             lastname: lastname,
             email: email,
@@ -112,7 +112,7 @@ export class UserRouter extends RouterRepository<User> {
             return;
         }
 
-        const organizationSuccess: boolean = this.organizationRepository.addUser(organization.id, data);
+        const organizationSuccess: boolean = this.organizationRepository.addUser(organizationsIdList, data);
 
         if (!organizationSuccess) {
             performFailureResponse(res, INVALID_REQUEST_PARAMETERS);
@@ -133,7 +133,7 @@ export class UserRouter extends RouterRepository<User> {
         const { userId, organizationId } = (req as any).user;
         const token: string = this.tokenManager.getAccessToken(userId, organizationId);
         const resourceId = Number(req.params.id);
-        const { name, lastname, email, groupsIdList, permissions, admin, locked } = req.body;
+        const { name, lastname, email, groupsIdList, organizationsIdList, permissions, admin, locked } = req.body;
 
         if (!name || !lastname || !email) {
             performFailureResponse(res, INVALID_CREDENTIALS);
@@ -142,6 +142,7 @@ export class UserRouter extends RouterRepository<User> {
 
         const userSuccess: number | null = this.repository.update({
             userId: resourceId,
+            organizationsIdList: organizationsIdList,
             name: name,
             lastname: lastname,
             email: email,
@@ -159,6 +160,13 @@ export class UserRouter extends RouterRepository<User> {
         const groupSuccess: boolean = this.groupRepository.updateUserGroups(resourceId, groupsIdList ?? []);
 
         if (!groupSuccess) {
+            performFailureResponse(res, INVALID_REQUEST_PARAMETERS);
+            return;
+        }
+
+        const organizationSuccess: boolean = this.organizationRepository.updateUser(organizationsIdList, resourceId);
+
+        if(!organizationSuccess){
             performFailureResponse(res, INVALID_REQUEST_PARAMETERS);
             return;
         }
