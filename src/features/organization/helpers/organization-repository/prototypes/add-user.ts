@@ -6,16 +6,18 @@ import { OrganizationRepository } from "../../../repository/organization-reposit
 const file = new FileManager("database", "organization");
 
 OrganizationRepository.prototype.addUser = function (
-    organizationId: number,
+    organizationsIdList: number[],
     user: User
 ): boolean {
     const jsonData: OrganizationJson[] = file.getFileAsJson();
 
-    const organizationJson: OrganizationJson | undefined = jsonData.find((item) => item.id === organizationId);
+    organizationsIdList.forEach((organizationId) => {
+        const organizationJson: OrganizationJson | undefined = jsonData.find((item) => item.id === organizationId);
 
-    if (!organizationJson) return false;
+        if (!organizationJson) return false;
 
-    organizationJson.usersIdList.push(user.id);
+        organizationJson.usersIdList.push(user.id);
+    })
 
     file.saveJsonAsFile(jsonData);
 

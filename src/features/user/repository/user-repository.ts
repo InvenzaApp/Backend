@@ -77,7 +77,8 @@ export class UserRepository extends CockpitRepository<User> {
         const userJson: UserJson | undefined = jsonData.find((item) => item.id === payload.userId);
 
         if (!userJson) return null;
-
+        
+        userJson.organizationsIdList = payload.organizationsIdList;
         userJson.name = payload.name;
         userJson.lastname = payload.lastname;
         userJson.title = `${payload.name} ${payload.lastname}`;

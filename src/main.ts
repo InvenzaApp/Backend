@@ -20,6 +20,7 @@ import './features/user/helpers/user-repository/prototypes/update-self-account';
 import './features/user/helpers/user-repository/prototypes/update-user-groups';
 
 import './features/organization/helpers/organization-repository/prototypes/add-user';
+import './features/organization/helpers/organization-repository/prototypes/update-user';
 import './features/organization/helpers/organization-repository/prototypes/delete-user';
 import './features/organization/helpers/organization-repository/prototypes/get-organization-admin';
 import './features/organization/helpers/organization-repository/prototypes/get-organization-by-user-id';
