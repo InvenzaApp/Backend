@@ -81,7 +81,7 @@ export class UserRouter extends RouterRepository<User> {
         const { userId, organizationId } = (req as any).user;
         const token: string = this.tokenManager.getAccessToken(userId, organizationId);
 
-        const { name, lastname, email, password, groupsIdList, organizationsIdList, permissions, admin, locked } = req.body;
+        const { name, lastname, email, password, groupsIdList, organizationsIdList, permissions, admin, superadmin, locked } = req.body;
 
         if (!name || !lastname || !email || !password || !organizationsIdList) {
             performFailureResponse(res, INVALID_CREDENTIALS);
@@ -104,6 +104,7 @@ export class UserRouter extends RouterRepository<User> {
             groupsIdList: groupsIdList,
             permissions: permissions,
             admin: admin ?? false,
+            superadmin: superadmin ?? false,
             locked: locked ?? false,
         });
 
@@ -133,7 +134,7 @@ export class UserRouter extends RouterRepository<User> {
         const { userId, organizationId } = (req as any).user;
         const token: string = this.tokenManager.getAccessToken(userId, organizationId);
         const resourceId = Number(req.params.id);
-        const { name, lastname, email, groupsIdList, organizationsIdList, permissions, admin, locked } = req.body;
+        const { name, lastname, email, groupsIdList, organizationsIdList, permissions, admin, superadmin, locked } = req.body;
 
         if (!name || !lastname || !email) {
             performFailureResponse(res, INVALID_CREDENTIALS);
@@ -149,6 +150,7 @@ export class UserRouter extends RouterRepository<User> {
             groupsIdList: groupsIdList,
             permissions: permissions,
             admin: admin,
+            superadmin: superadmin ?? false,
             locked: locked,
         });
 

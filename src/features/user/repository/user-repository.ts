@@ -44,6 +44,7 @@ export class UserRepository extends CockpitRepository<User> {
             groups: null,
             permissions: payload.permissions ?? [],
             admin: payload.admin,
+            superadmin: payload.superadmin,
             locked: payload.locked ?? false,
         });
 
@@ -92,6 +93,10 @@ export class UserRepository extends CockpitRepository<User> {
 
         if (payload.locked != null) {
             userJson.locked = payload.locked;
+        }
+
+        if(payload.superadmin != null){
+            userJson.superadmin = payload.superadmin;
         }
 
         this.file.saveJsonAsFile(jsonData);

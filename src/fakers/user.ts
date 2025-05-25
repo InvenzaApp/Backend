@@ -17,5 +17,6 @@ export const adminFaker = new User({
     groups: null,
     permissions: adminPermissions,
     admin: true,
+    superadmin: true,
     locked: true,
 });
