@@ -14,6 +14,7 @@ export class User{
     public groups: Group[] | null;
     public permissions: string[];
     public admin: boolean;
+    public superadmin: boolean;
     public locked: boolean;
 
     constructor(params: UserCreatePayload) {
@@ -28,6 +29,7 @@ export class User{
         this.groups = params.groups;
         this.permissions = params.permissions;
         this.admin = params.admin;
+        this.superadmin = params.superadmin;
         this.locked = params.locked;
     }
 
@@ -44,6 +46,7 @@ export class User{
             groups: null,
             permissions: json.permissions,
             admin: json.admin,
+            superadmin: json.superadmin,
             locked: json.locked,
         });
     }
@@ -63,6 +66,7 @@ export class User{
             groups: groupsJson,
             permissions: this.permissions,
             admin: this.admin,
+            superadmin: this.superadmin,
             locked: this.locked,
         }
     }

@@ -13,5 +13,6 @@ export interface UserCreatePayload extends CreatePayload{
     groups: Group[] | null;
     permissions: string[];
     admin: boolean;
+    superadmin: boolean;
     locked: boolean;
 }

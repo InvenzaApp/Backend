@@ -12,5 +12,6 @@ export type UserJson = {
     groups: GroupJson[] | null;
     permissions: string[];
     admin: boolean;
+    superadmin: boolean;
     locked: boolean;
 }
