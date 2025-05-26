@@ -1,13 +1,13 @@
 import { CockpitRepository } from "../../../core/repository/cockpit-repository";
 import { CreatePayload } from "../../../core/repository/models/payload/create-payload";
 import { UpdatePayload } from "../../../core/repository/models/payload/update-payload";
-import { defaultOrganization } from "../../../fakers/organization";
 import FileManager from "../../../managers/file-manager";
 import { Organization } from "../models/organization";
 import { OrganizationJson } from "../models/organization-json";
 import { OrganizationUpdatePayload } from "../payload/organization-update-payload";
 import IdGetter from "../../../helpers/id-getter";
 import { OrganizationCreatePayload } from "../payload/organization-create-payload";
+import { defaultOrganizationModel } from "../../../database-models/organization";
 
 export class OrganizationRepository extends CockpitRepository<Organization> {
     private file: FileManager;
@@ -20,7 +20,7 @@ export class OrganizationRepository extends CockpitRepository<Organization> {
         this.file.initializeFile();
 
         if(this.file.isEmpty()){
-             this.file.saveJsonAsFile([defaultOrganization]);
+             this.file.saveJsonAsFile([defaultOrganizationModel]);
         }
     }
 
