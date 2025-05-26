@@ -73,7 +73,6 @@ export class OrganizationRouter extends RouterRepository<Organization>{
 
         if(user == null){
             performFailureResponse(res, INVALID_REQUEST_PARAMETERS);
-            console.log('test1');
             return;
         }
 
@@ -87,7 +86,6 @@ export class OrganizationRouter extends RouterRepository<Organization>{
             country == null
         ){
             performFailureResponse(res, INVALID_REQUEST_PARAMETERS);
-            console.log('test2');
             return;
         }
 
@@ -110,7 +108,6 @@ export class OrganizationRouter extends RouterRepository<Organization>{
 
         if(organization == null){
             performFailureResponse(res, INVALID_REQUEST_PARAMETERS);
-            console.log('test3');
         }else{
             performSuccessResponse(res, organization.id, token);
         }
@@ -127,15 +124,8 @@ export class OrganizationRouter extends RouterRepository<Organization>{
             return;
         }
 
-        const organization: Organization | null = (this.repository as OrganizationRepository).getOrganizationByUserId(userId);
-
-        if(!organization){
-            performFailureResponse(res, INVALID_REQUEST_PARAMETERS);
-            return;
-        }
-
         const success = this.repository.update({
-            organizationId: organization.id, 
+            organizationId: organizationId, 
             title: title, 
             street: street, 
             buildingNumber: buildingNumber, 

@@ -11,6 +11,7 @@ import { TaskUpdatePayload } from "../payload/task-update-payload";
 import { TaskJson } from "../models/task-json";
 import { GroupRepository } from "../../group/repository/group-repository";
 import { OrganizationRepository } from "../../organization/repository/organization-repository";
+import { invenzaAppleTaskModel, invenzaGoogleTaskModel } from "../../../database-models/task";
 
 export class TaskRepository extends CockpitRepository<Task>{
     private file: FileManager;
@@ -23,6 +24,17 @@ export class TaskRepository extends CockpitRepository<Task>{
         this.groupRepository = new GroupRepository();
         this.organizationRepository = new OrganizationRepository();
         this.file.initializeFile();
+
+        if(this.file.isEmpty()){
+            this.initializeFile();
+        }
+    }
+
+    private initializeFile(){
+        this.file.saveJsonAsFile([
+            invenzaGoogleTaskModel,
+            invenzaAppleTaskModel,
+        ]);
     }
 
     add(payload: TaskCreatePayload): Task | null {

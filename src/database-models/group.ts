@@ -1,4 +1,4 @@
-export const googleGroupModel = {
+export const invenzaGoogleGroupModel = {
     'id': 0,
     'title': 'Google members',
     'usersIdList': [0, 1],
@@ -6,7 +6,7 @@ export const googleGroupModel = {
     'locked': true
 }
 
-export const appleGroupModel = {
+export const invenzaAppleGroupModel = {
     'id': 1,
     'title': 'Apple members',
     'usersIdList': [0, 2],
