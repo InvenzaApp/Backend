@@ -6,6 +6,8 @@ import FileManager from "../../../managers/file-manager";
 import { Organization } from "../models/organization";
 import { OrganizationJson } from "../models/organization-json";
 import { OrganizationUpdatePayload } from "../payload/organization-update-payload";
+import IdGetter from "../../../helpers/id-getter";
+import { OrganizationCreatePayload } from "../payload/organization-create-payload";
 
 export class OrganizationRepository extends CockpitRepository<Organization> {
     private file: FileManager;
@@ -22,8 +24,25 @@ export class OrganizationRepository extends CockpitRepository<Organization> {
         }
     }
 
-    add(payload: CreatePayload): Organization | null {
-        throw new Error("Method not implemented.");
+    add(payload: OrganizationCreatePayload): Organization | null {
+        const jsonData: OrganizationJson[] = this.file.getFileAsJson();
+        
+        const newId = IdGetter(jsonData);
+
+        const newOrganization = new Organization({
+            id: newId,
+            title: payload.title,
+            users: payload.users,
+            admin: payload.admin,
+            address: payload.address,
+            locked: payload.locked
+        })
+
+        jsonData.push(newOrganization.toJson());
+
+        this.file.saveJsonAsFile(jsonData);
+
+        return newOrganization;
     }
 
     get(resourceId: number): Organization | null {

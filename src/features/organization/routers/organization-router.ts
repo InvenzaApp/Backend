@@ -7,18 +7,22 @@ import { performFailureResponse, performSuccessResponse } from "../../../helpers
 import { INVALID_REQUEST_PARAMETERS } from "../../../helpers/response-codes";
 import { authMiddleware } from "../../../authorization/api_authorization";
 import { organizationMiddleware } from "../../../authorization/organization_authorization";
+import { UserRepository } from "../../user/repository/user-repository";
+import { Address } from "../../address/models/address";
 
 require("dotenv").config();
 
 export class OrganizationRouter extends RouterRepository<Organization>{
     router: Router;
     private tokenManager: TokenManager;
+    private userRepository: UserRepository;
 
     constructor(){
         super(new OrganizationRepository());
 
         this.router = Router();
         this.tokenManager = new TokenManager();
+        this.userRepository = new UserRepository();
 
         this.initializeRoutes();
     }
@@ -26,7 +30,8 @@ export class OrganizationRouter extends RouterRepository<Organization>{
     private initializeRoutes(){
         this.router.get('/:id', authMiddleware, this.get.bind(this));
         this.router.get('/', organizationMiddleware, this.getAll.bind(this));
-        this.router.post('/organization-update', authMiddleware, this.post.bind(this));
+        this.router.put('/:id', authMiddleware, this.put.bind(this));
+        this.router.post('/', organizationMiddleware, this.post.bind(this));
 
         this.router.post('/select-organization', organizationMiddleware, this.selectOrganization.bind(this));
     }
@@ -59,6 +64,59 @@ export class OrganizationRouter extends RouterRepository<Organization>{
     }
     
     post(req: Request, res: Response): void {
+        const { userId } = (req as any).user;
+        const token = this.tokenManager.getOrganizationToken(userId);
+
+        const { title, street, buildingNumber, apartmentNumber, postCode, city, country } = req.body;
+
+        const user = this.userRepository.get(userId);
+
+        if(user == null){
+            performFailureResponse(res, INVALID_REQUEST_PARAMETERS);
+            console.log('test1');
+            return;
+        }
+
+
+        if(
+            title == null ||
+            street == null ||
+            buildingNumber == null ||
+            postCode == null ||
+            city == null ||
+            country == null
+        ){
+            performFailureResponse(res, INVALID_REQUEST_PARAMETERS);
+            console.log('test2');
+            return;
+        }
+
+        const address = new Address({
+            street: street,
+            buildingNumber: buildingNumber,
+            apartmentNumber: apartmentNumber ?? null,
+            postCode: postCode,
+            city: city,
+            country: country
+        });
+
+        const organization = this.repository.add({
+            title: title,
+            users: [user],
+            admin: user,
+            address: address,
+            locked: false,
+        });
+
+        if(organization == null){
+            performFailureResponse(res, INVALID_REQUEST_PARAMETERS);
+            console.log('test3');
+        }else{
+            performSuccessResponse(res, organization.id, token);
+        }
+    }
+    
+    put(req: Request, res: Response): void {
         const { userId, organizationId } = (req as any).user;
         const token: string = this.tokenManager.getAccessToken(userId, organizationId);
 
@@ -93,10 +151,6 @@ export class OrganizationRouter extends RouterRepository<Organization>{
         }else{
             performSuccessResponse(res, success, token);
         }
-    }
-    
-    put(req: Request, res: Response): void {
-        throw new Error("Method not implemented.");
     }
     
     delete(req: Request, res: Response): void {
