@@ -1,12 +1,12 @@
 import FileManager from "../../../managers/file-manager";
 import hashPassword from "../../../helpers/hash-password";
 import { User } from "../models/user";
-import { adminFaker } from "../../../fakers/user";
 import IdGetter from "../../../helpers/id-getter";
 import { CockpitRepository } from "../../../core/repository/cockpit-repository";
 import { UserCreatePayload } from "../payload/user-create-payload";
 import { UserUpdatePayload } from "../payload/user-update-payload";
 import { UserJson } from "../models/user-json";
+import { defaultAdminModel, defaultAppleModel, defaultGoogleModel } from "../../../database-models/user";
 
 require("dotenv").config();
 
@@ -116,7 +116,9 @@ export class UserRepository extends CockpitRepository<User> {
 
     private initializeFile() {
         this.file.saveJsonAsFile([
-            adminFaker.toJson(),
+            defaultAdminModel.toJson(),
+            defaultGoogleModel.toJson(),
+            defaultAppleModel.toJson()
         ]);
     }
 }

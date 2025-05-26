@@ -1,4 +1,4 @@
-export const addressFaker = {
+export const defaultAddressModel = {
     'street': 'Spacerowa',
     'buildingNumber': '11',
     'apartmentNumber': '11',
