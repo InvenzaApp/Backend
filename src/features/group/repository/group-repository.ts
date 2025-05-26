@@ -7,7 +7,7 @@ import IdGetter from "../../../helpers/id-getter";
 import { GroupCreatePayload } from "../payload/group-create-payload";
 import { GroupUpdatePayload } from "../payload/group-update-payload";
 import { UserRepository } from "../../user/repository/user-repository";
-import { appleGroupModel, googleGroupModel } from "../../../database-models/group";
+import { invenzaAppleGroupModel, invenzaGoogleGroupModel } from "../../../database-models/group";
 
 export class GroupRepository extends CockpitRepository<Group> {
     private file: FileManager;
@@ -27,8 +27,8 @@ export class GroupRepository extends CockpitRepository<Group> {
 
     private initializeFile(){
         this.file.saveJsonAsFile([
-            googleGroupModel,
-            appleGroupModel,
+            invenzaGoogleGroupModel,
+            invenzaAppleGroupModel,
         ]);
     }
 
