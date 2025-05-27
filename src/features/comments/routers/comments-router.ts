@@ -50,7 +50,7 @@ export class CommentsRouter extends RouterRepository<TaskComment>{
             return;
         }
 
-        const comments: TaskComment[] | null = this.repository.getAll(taskId);
+        const comments: TaskComment[] | null = this.repository.getAll(taskId, organizationId);
 
         if(!comments){
             performFailureResponse(res, INVALID_REQUEST_PARAMETERS);
