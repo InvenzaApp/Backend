@@ -52,7 +52,7 @@ export class UserRouter extends RouterRepository<User> {
         const token: string = this.tokenManager.getAccessToken(userId, organizationId);
 
         const user: User | null = this.repository.get(resourceId);
-        const groups: Group[] | null = this.groupRepository.getAll(resourceId);
+        const groups: Group[] | null = this.groupRepository.getAll(resourceId, organizationId);
 
         if (!user) {
             performFailureResponse(res, INVALID_REQUEST_PARAMETERS);
@@ -68,7 +68,7 @@ export class UserRouter extends RouterRepository<User> {
         const { userId, organizationId } = (req as any).user;
         const token: string = this.tokenManager.getAccessToken(userId, organizationId);
 
-        const usersList: User[] | null = this.repository.getAll(organizationId);
+        const usersList: User[] | null = this.repository.getAll(userId, organizationId);
 
         if (usersList == null) {
             performFailureResponse(res, INVALID_REQUEST_PARAMETERS);
