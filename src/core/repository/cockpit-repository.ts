@@ -7,7 +7,7 @@ export abstract class CockpitRepository<T extends ItemEntity>{
 
     abstract get(resourceId: number): T | null;
 
-    abstract getAll(resourceId: number): T[] | null;
+    abstract getAll(resourceId: number, organizationId: number): T[] | null;
 
     abstract update(payload: UpdatePayload): number | null;
 

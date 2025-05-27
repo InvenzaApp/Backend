@@ -9,5 +9,6 @@ export interface UserUpdatePayload extends UpdatePayload {
     groupsIdList: number[] | null;
     permissions: string[] | null;
     admin: boolean | null;
+    superadmin: boolean | null;
     locked: boolean | null;
 }

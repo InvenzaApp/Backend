@@ -6,6 +6,7 @@ export class Group{
     public id: number;
     public title: string;
     public usersIdList: number[];
+    public organizationsIdList: number[];
     public usersList: User[] | null;
     public locked: boolean;
 
@@ -13,6 +14,7 @@ export class Group{
         this.id = params.id;
         this.title = params.title;
         this.usersIdList = params.usersIdList;
+        this.organizationsIdList = params.organizationsIdList;
         this.usersList = params.usersList;
         this.locked = params.locked;
     }
@@ -22,6 +24,7 @@ export class Group{
             id: json.id,
             title: json.title,
             usersIdList: json.usersIdList,
+            organizationsIdList: json.organizationsIdList,
             usersList: null,
             locked: json.locked,
         });
@@ -32,6 +35,7 @@ export class Group{
             id: this.id,
             title: this.title,
             usersIdList: this.usersIdList,
+            organizationsIdList: this.organizationsIdList,
             usersList: null,
             locked: this.locked,
         }

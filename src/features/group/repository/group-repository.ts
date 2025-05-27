@@ -7,6 +7,7 @@ import IdGetter from "../../../helpers/id-getter";
 import { GroupCreatePayload } from "../payload/group-create-payload";
 import { GroupUpdatePayload } from "../payload/group-update-payload";
 import { UserRepository } from "../../user/repository/user-repository";
+import { invenzaAppleGroupModel, invenzaGoogleGroupModel } from "../../../database-models/group";
 
 export class GroupRepository extends CockpitRepository<Group> {
     private file: FileManager;
@@ -18,6 +19,17 @@ export class GroupRepository extends CockpitRepository<Group> {
         this.userRepository = new UserRepository();
 
         this.file.initializeFile();
+
+        if(this.file.isEmpty()){
+            this.initializeFile();
+        }
+    }
+
+    private initializeFile(){
+        this.file.saveJsonAsFile([
+            invenzaGoogleGroupModel,
+            invenzaAppleGroupModel,
+        ]);
     }
 
     add(payload: GroupCreatePayload): Group | null {
@@ -30,6 +42,7 @@ export class GroupRepository extends CockpitRepository<Group> {
             title: payload.title,
             usersIdList: payload.usersIdList,
             usersList: null,
+            organizationsIdList: payload.organizationsIdList,
             locked: payload.locked,
         });
 
@@ -66,11 +79,11 @@ export class GroupRepository extends CockpitRepository<Group> {
         return group;
     }
 
-    getAll(resourceId: number): Group[] | null {
+    getAll(resourceId: number, organizationId: number): Group[] | null {
         const jsonData: GroupJson[] = this.file.getFileAsJson();
 
         const filteredData: GroupJson[] = jsonData.filter((groupJson) => {
-            return groupJson.usersIdList.some((item) => item === resourceId);
+            return groupJson.usersIdList.some((item) => item === resourceId) && groupJson.organizationsIdList.includes(organizationId);
         });
 
         const groupsList: Group[] = filteredData.flatMap((item) => {
@@ -88,6 +101,10 @@ export class GroupRepository extends CockpitRepository<Group> {
         return groupsList;
     }
 
+    fetchAll(userId: number, organizationId: number): Group[] | null{
+        return this.fetchAll(userId, organizationId);
+    }
+
     update(payload: GroupUpdatePayload): number | null {
         const jsonData: GroupJson[] = this.file.getFileAsJson();
 
@@ -97,6 +114,7 @@ export class GroupRepository extends CockpitRepository<Group> {
 
         groupJson.title = payload.title;
         groupJson.usersIdList = payload.usersIdList;
+        groupJson.organizationsIdList = payload.organizationsIdList;
 
         if (payload.locked != null) {
             groupJson.locked = payload.locked;
