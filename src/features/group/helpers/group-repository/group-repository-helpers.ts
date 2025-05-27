@@ -1,3 +1,4 @@
+import { Group } from "../../models/group";
 import { GroupRepository } from "../../repository/group-repository";
 
 declare module "../../repository/group-repository" {

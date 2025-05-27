@@ -53,7 +53,7 @@ export class TaskRouter extends RouterRepository<Task>{
         const { userId, organizationId } = (req as any).user;
         const token: string = this.tokenManager.getAccessToken(userId, organizationId);
 
-        const tasks: Task[] | null = this.repository.getAll(userId);
+        const tasks: Task[] | null = this.repository.getAll(userId, organizationId);
 
         if(tasks == null){
             performFailureResponse(res, INVALID_REQUEST_PARAMETERS);
