@@ -54,7 +54,7 @@ export class OrganizationRouter extends RouterRepository<Organization>{
         const { userId } = (req as any).user;
         const token: string = this.tokenManager.getOrganizationToken(userId);
 
-        const organizationsList: Organization[] | null = this.repository.getAll(userId);
+        const organizationsList: Organization[] | null = this.repository.getAll(userId, 0);
 
         if(organizationsList == null){
             performFailureResponse(res, INVALID_REQUEST_PARAMETERS);

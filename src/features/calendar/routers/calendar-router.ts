@@ -50,7 +50,7 @@ export class CalendarRouter extends RouterRepository<Event>{
         const { userId, organizationId } = (req as any).user;
         const token: string = this.tokenManager.getAccessToken(userId, organizationId);
 
-        const events: Event[] | null = this.repository.getAll(userId);
+        const events: Event[] | null = this.repository.getAll(userId, organizationId);
 
         if(events == null){
             performFailureResponse(res, INVALID_REQUEST_PARAMETERS);
