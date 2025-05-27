@@ -56,7 +56,7 @@ export class GroupRouter extends RouterRepository<Group>{
         const { userId, organizationId } = (req as any).user;
         const token: string = this.tokenManager.getAccessToken(userId, organizationId);
 
-        const groupsList: Group[] | null = this.repository.getAll(userId);
+        const groupsList: Group[] | null = this.repository.getAll(userId, organizationId);
 
         if(groupsList == null){
             performFailureResponse(res, INVALID_REQUEST_PARAMETERS);
@@ -66,18 +66,19 @@ export class GroupRouter extends RouterRepository<Group>{
     }
 
     post(req: Request, res: Response): void {
-        const { name, usersIdList, locked } = req.body;
+        const { name, usersIdList, organizationsIdList, locked } = req.body;
         const { userId, organizationId } = (req as any).user;
         const token: string = this.tokenManager.getAccessToken(userId, organizationId);
 
-        if(!name || !usersIdList){
+        if(!name || !usersIdList || organizationsIdList == null){
         performFailureResponse(res, INVALID_REQUEST_PARAMETERS)
         return;
         }
 
         const group: Group | null = this.repository.add({
             title: name, 
-            usersIdList: usersIdList, 
+            usersIdList: usersIdList,
+            organizationsIdList: organizationsIdList,
             locked: locked ?? false
         });
 
@@ -92,13 +93,13 @@ export class GroupRouter extends RouterRepository<Group>{
     }
 
     put(req: Request, res: Response): void {
-        const { name, usersIdList, locked } = req.body;
+        const { name, usersIdList, organizationsIdList, locked } = req.body;
         const { userId, organizationId } = (req as any).user;
         const token: string = this.tokenManager.getAccessToken(userId, organizationId);
 
         const groupRepository = new GroupRepository();
 
-        if(!name || !usersIdList){
+        if(!name || !usersIdList || organizationsIdList == null){
             performFailureResponse(res, INVALID_REQUEST_PARAMETERS);
             return;
         }
@@ -115,6 +116,7 @@ export class GroupRouter extends RouterRepository<Group>{
             id: groupId, 
             title: name, 
             usersIdList: usersIdList, 
+            organizationsIdList: organizationsIdList,
             locked: locked,
         });
 

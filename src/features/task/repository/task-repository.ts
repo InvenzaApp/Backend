@@ -97,10 +97,10 @@ export class TaskRepository extends CockpitRepository<Task>{
         return task;
     }
 
-    getAll(resourceId: number): Task[] | null {
+    getAll(resourceId: number, organizationId: number): Task[] | null {
         const jsonData: TaskJson[] = this.file.getFileAsJson();
 
-        const groups: Group[] | null = this.groupRepository.getAll(resourceId);
+        const groups: Group[] | null = this.groupRepository.getAll(resourceId, organizationId);
         if(groups == null) return null;
 
         const organization: Organization | null = this.organizationRepository.getOrganizationByUserId(resourceId);

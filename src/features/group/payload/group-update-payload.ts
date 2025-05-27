@@ -6,5 +6,6 @@ export interface GroupUpdatePayload extends UpdatePayload {
     title: string;
     usersIdList: number[];
     usersList: User[] | null;
+    organizationsIdList: number[];
     locked: boolean | null;
 }

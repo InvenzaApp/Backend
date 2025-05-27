@@ -5,5 +5,6 @@ export type GroupJson = {
     title: string;
     usersIdList: number[];
     usersList: UserJson[] | null;
+    organizationsIdList: number[],
     locked: boolean;
 }

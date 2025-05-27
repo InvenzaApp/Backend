@@ -42,6 +42,7 @@ export class GroupRepository extends CockpitRepository<Group> {
             title: payload.title,
             usersIdList: payload.usersIdList,
             usersList: null,
+            organizationsIdList: payload.organizationsIdList,
             locked: payload.locked,
         });
 
@@ -78,11 +79,11 @@ export class GroupRepository extends CockpitRepository<Group> {
         return group;
     }
 
-    getAll(resourceId: number): Group[] | null {
+    getAll(resourceId: number, organizationId: number): Group[] | null {
         const jsonData: GroupJson[] = this.file.getFileAsJson();
 
         const filteredData: GroupJson[] = jsonData.filter((groupJson) => {
-            return groupJson.usersIdList.some((item) => item === resourceId);
+            return groupJson.usersIdList.some((item) => item === resourceId) && groupJson.organizationsIdList.includes(organizationId);
         });
 
         const groupsList: Group[] = filteredData.flatMap((item) => {
@@ -100,6 +101,10 @@ export class GroupRepository extends CockpitRepository<Group> {
         return groupsList;
     }
 
+    fetchAll(userId: number, organizationId: number): Group[] | null{
+        return this.fetchAll(userId, organizationId);
+    }
+
     update(payload: GroupUpdatePayload): number | null {
         const jsonData: GroupJson[] = this.file.getFileAsJson();
 
@@ -109,6 +114,7 @@ export class GroupRepository extends CockpitRepository<Group> {
 
         groupJson.title = payload.title;
         groupJson.usersIdList = payload.usersIdList;
+        groupJson.organizationsIdList = payload.organizationsIdList;
 
         if (payload.locked != null) {
             groupJson.locked = payload.locked;
