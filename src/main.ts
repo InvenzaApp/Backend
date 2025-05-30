@@ -37,12 +37,15 @@ import fs from "fs";
 import * as https from "node:https";
 import * as http from "node:http";
 import path from "path";
+import cors from 'cors';
 
 require('dotenv').config();
 
 const app = express();
 const port = process.env.SERVER_PORT || 3000;
 const isDebug = process.env.DEBUG == "true";
+
+app.use(cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
