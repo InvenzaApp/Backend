@@ -66,17 +66,17 @@ export class GroupRouter extends RouterRepository<Group>{
     }
 
     post(req: Request, res: Response): void {
-        const { name, usersIdList, organizationsIdList, locked } = req.body;
+        const { title, usersIdList, organizationsIdList, locked } = req.body;
         const { userId, organizationId } = (req as any).user;
         const token: string = this.tokenManager.getAccessToken(userId, organizationId);
 
-        if(!name || !usersIdList || organizationsIdList == null){
+        if(!title || usersIdList == null || organizationsIdList == null){
         performFailureResponse(res, INVALID_REQUEST_PARAMETERS)
         return;
         }
 
         const group: Group | null = this.repository.add({
-            title: name, 
+            title: title, 
             usersIdList: usersIdList,
             organizationsIdList: organizationsIdList,
             locked: locked ?? false
@@ -93,13 +93,13 @@ export class GroupRouter extends RouterRepository<Group>{
     }
 
     put(req: Request, res: Response): void {
-        const { name, usersIdList, organizationsIdList, locked } = req.body;
+        const { title, usersIdList, organizationsIdList, locked } = req.body;
         const { userId, organizationId } = (req as any).user;
         const token: string = this.tokenManager.getAccessToken(userId, organizationId);
 
         const groupRepository = new GroupRepository();
 
-        if(!name || !usersIdList || organizationsIdList == null){
+        if(!title || usersIdList == null || organizationsIdList == null){
             performFailureResponse(res, INVALID_REQUEST_PARAMETERS);
             return;
         }
@@ -114,7 +114,7 @@ export class GroupRouter extends RouterRepository<Group>{
 
         const groupSuccess = this.repository.update({
             id: groupId, 
-            title: name, 
+            title: title, 
             usersIdList: usersIdList, 
             organizationsIdList: organizationsIdList,
             locked: locked,

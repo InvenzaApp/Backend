@@ -56,7 +56,7 @@ export class OrganizationRepository extends CockpitRepository<Organization> {
         return Organization.fromJson(organizationJson);
     }
 
-    getAll(resourceId: number): Organization[] | null {
+    getAll(resourceId: number, organizationId: number): Organization[] | null {
         const jsonData: OrganizationJson[] = this.file.getFileAsJson();
         const filteredData: OrganizationJson[] | null = jsonData.filter((org) => org.usersIdList.includes(resourceId));
 

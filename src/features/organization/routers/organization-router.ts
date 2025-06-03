@@ -34,6 +34,7 @@ export class OrganizationRouter extends RouterRepository<Organization>{
         this.router.post('/', organizationMiddleware, this.post.bind(this));
 
         this.router.post('/select-organization', organizationMiddleware, this.selectOrganization.bind(this));
+        this.router.post('/fetch-organizations', authMiddleware, this.fetchOrganizations.bind(this));
     }
 
     get(req: Request, res: Response): void {
@@ -159,6 +160,19 @@ export class OrganizationRouter extends RouterRepository<Organization>{
         const token: string = this.tokenManager.getAccessToken(userId, organizationId);
 
         performSuccessResponse(res, true, token);
+    }
+
+    fetchOrganizations(req: Request, res: Response){
+        const { userId, organizationId } = (req as any).user;
+        const token: string = this.tokenManager.getAccessToken(userId, organizationId);
+
+        const organizationsList: Organization[] | null = this.repository.getAll(userId, organizationId);
+
+        if(organizationsList == null){
+            performFailureResponse(res, INVALID_REQUEST_PARAMETERS);
+        }else{
+            performSuccessResponse(res, organizationsList, token);
+        }
     }
 }
 
